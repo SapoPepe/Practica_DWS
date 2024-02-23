@@ -3,6 +3,7 @@ package DWS.practica_dws.controller;
 import DWS.practica_dws.model.Product;
 import DWS.practica_dws.service.ProductsService;
 import DWS.practica_dws.service.UserSession;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +21,8 @@ public class ProductController {
 
 
     @GetMapping("/")
-    public String showProducts(Model model){
+    public String showProducts(Model model, HttpSession httpSession){
+            if(httpSession.isNew()) this.userSession = new UserSession(httpSession);
             model.addAttribute("products", this.productsService.getAll());
         return "index";
     }
@@ -34,11 +36,19 @@ public class ProductController {
         return "saveProduct";
     }
 
-    @PostMapping("followProduct?id={id}")
-    public String follow(Model m, @RequestParam Long id){
-        this.userSession.follow(this.productsService.getProduct(id));
-        m.addAttribute(m);
+    @PostMapping("/followProduct")
+    public String follow(Model m, @RequestParam String id){
+        Long identification = Long.parseLong(id);
+        this.userSession.follow(this.productsService.getProduct(identification));
+        m.addAttribute("name", this.productsService.getProduct(identification).getName());
         return "followProduct";
+    }
+
+
+    @GetMapping("/shoppingCart")
+    public String userProducts(Model m){
+        m.addAttribute("products", this.userSession.userProducts());
+        return "shoppingCart";
     }
 
 

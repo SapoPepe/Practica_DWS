@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Carrito</title>
+</head>
+<body>
+    {{#products}}
+    <p>{{name}} {{description}} {{prize}}</p>
+    {{/products}}
+
+    {{^products}}
+    <p>No tienes nada en la cesta de la compra</p>
+    {{/products}}
+</body>
+</html>
