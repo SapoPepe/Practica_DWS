@@ -54,5 +54,26 @@ public class ProductController {
         return "shoppingCart";
     }
 
+    @GetMapping("/product/{id}")
+    public String showProduct(Model model, @PathVariable Long id){
+        Product prod1 = productsService.getProduct(id);
+
+        model.addAttribute("name", prod1.getName());
+        model.addAttribute("price", prod1.getPrice());
+        model.addAttribute("description", prod1.getDescription());
+        //model.addAttribute("image", prod1.getImage());
+
+        return "showProduct";
+    }
+
+    @GetMapping("/product/{id}/delete")
+    public String deleteProduct(Model model, @PathVariable long id) {
+        if(productsService.getProduct(id)!=null){
+            productsService.deleteProduct(id);
+        }
+        model.addAttribute("allProducts",productsService.getAll());
+
+        return "deletedProduct";
+    }
 
 }

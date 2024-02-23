@@ -36,4 +36,14 @@ public class ProductsService {
     public Product getProduct(Long id){
         return this.defaultProducts.get(id);
     }
+
+    public Product deleteProduct (long id){
+        if(this.defaultProducts.containsKey(id)){
+            Product product= this.getProduct(id);
+            this.defaultProducts.remove(id);
+            return product;
+        }
+        return null;
+    }
+
 }

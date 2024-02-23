@@ -23,4 +23,10 @@ public class Product {
         return this.name;
     }
 
+    public double getPrice() {
+        return prize;
+    }
+    public String getDescription() {
+        return description;
+    }
 }
