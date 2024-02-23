@@ -9,7 +9,8 @@
 
     {{#products}}
     <form method="post" action="/followProduct?id={{id}}">
-        <p>{{name}} {{description}} {{prize}}</p>
+        <p>{{id}} {{name}} {{description}} {{prize}}</p>
+        <img src="/images/products/{{id}}.jpeg" width="500px" height="500px" />
         <input type="submit" value="Añadir">
     </form>
     {{/products}}

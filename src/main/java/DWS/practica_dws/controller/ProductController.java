@@ -1,6 +1,7 @@
 package DWS.practica_dws.controller;
 
 import DWS.practica_dws.model.Product;
+import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.ProductsService;
 import DWS.practica_dws.service.UserSession;
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +20,8 @@ public class ProductController {
     @Autowired
     private ProductsService productsService;
 
+    private static final String PRODUCTS_IMAGES_FOLDER = "products";
+    private ImageService imageService;
 
     @GetMapping("/")
     public String showProducts(Model model, HttpSession httpSession){

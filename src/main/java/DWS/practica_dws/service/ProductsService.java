@@ -12,9 +12,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ProductsService {
     //Each product have a diferent ID
     private Map<Long, Product> defaultProducts;
-    private AtomicLong nextId = new AtomicLong();
+    //private AtomicLong nextId = new AtomicLong();
 
-
+    public static long idNumber = 0;
     public ProductsService(){
         this.defaultProducts = new HashMap<>();
         saveProduct(new Product("Producto1", "Descripción de producto 1", 30.23));
@@ -23,9 +23,10 @@ public class ProductsService {
     }
 
     public void saveProduct(Product p){
-        long id = nextId.getAndIncrement();
-        p.setID(id);
-        this.defaultProducts.put(id, p);
+        //long id = nextId.getAndIncrement();
+        p.setID(idNumber);
+        this.defaultProducts.put(idNumber, p);
+        idNumber++;
     }
 
     public Collection<Product> getAll(){

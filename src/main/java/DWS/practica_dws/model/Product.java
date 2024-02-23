@@ -7,7 +7,7 @@ public class Product {
     private double prize;
     private String description;
     private String name;
-    private Image image;    //Implement the img for the product
+
 
     public Product(String name, String description, double prize){
         this.name = name;
