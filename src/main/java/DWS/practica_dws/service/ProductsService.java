@@ -1,9 +1,8 @@
 package DWS.practica_dws.service;
 
-import DWS.practica_dws.Product;
+import DWS.practica_dws.model.Product;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package DWS.practica_dws;
+package DWS.practica_dws.model;
 
 import java.awt.*;
 
