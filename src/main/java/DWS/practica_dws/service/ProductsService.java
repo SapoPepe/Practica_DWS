@@ -31,4 +31,8 @@ public class ProductsService {
     public Collection<Product> getAll(){
         return this.defaultProducts.values();
     }
+
+    public Product getProduct(Long id){
+        return this.defaultProducts.get(id);
+    }
 }

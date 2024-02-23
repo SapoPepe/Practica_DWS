@@ -8,7 +8,10 @@
     <h2>Productos</h2>
 
     {{#products}}
-    <a>{{name}} {{description}} {{prize}}</a><br>
+    <form method="post" action="/followProduct?id={{id}}">
+        <p>{{name}} {{description}} {{prize}}</p>
+        <input type="submit" value="Añadir">
+    </form>
     {{/products}}
 
     {{^products}}
