@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Carrito</title>
+</head>
+<body>
+    {{#products}}
+    <p>{{name}} {{prize}} <br>{{description}}</p>
+    <form method="post" action="/removeProductFromCart?id={{id}}">
+        <input type="submit" value="Eliminar">
+    </form>
+    <br>
+    {{/products}}
+
+    {{^products}}
+    <p>No tienes nada en la cesta de la compra</p>
+    {{/products}}
+
+
+    <a href="/">Voler al inicio</a>
+
+</body>
+</html>

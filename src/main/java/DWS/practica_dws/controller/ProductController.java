@@ -7,9 +7,14 @@ import DWS.practica_dws.service.UserSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
 
 @Controller
 public class ProductController {
@@ -18,27 +23,25 @@ public class ProductController {
     @Autowired
     private ProductsService productsService;
 
-    private static final String PRODUCTS_IMAGES_FOLDER = "products";
-    private ImageService imageService;
+    private static final String PRODUCTS_FOLDER = "products";
+    private ImageService imageService = new ImageService();
 
     @GetMapping("/")
     public String showProducts(Model model, HttpSession httpSession){
-            if(httpSession.isNew()) this.userSession = new UserSession(httpSession);
-            model.addAttribute("products", this.productsService.getAll());
+        if(httpSession.isNew()) this.userSession = new UserSession(httpSession);
+        model.addAttribute("products", this.productsService.getAll());
         return "index";
     }
 
     @PostMapping("/product/new")
-    public String newProduct(Model model, HttpServletRequest request) {
-
+    public String newProduct(Model model, HttpServletRequest request, @RequestParam("image") MultipartFile image) {
         Product p;
         String name = request.getParameter("name");
         String description = request.getParameter("description");
         String prize = request.getParameter("prize");
 
-        //If it doens't have the principal of the product
-        if(name!=null && Integer.parseInt(prize)>=0){
-            if(description!=null){
+        if (name != null && Integer.parseInt(prize) >= 0) {
+            if (description == null) {
                 p = new Product(name, "Producto sin descripción", Integer.parseInt(prize));
             } else {
                 p = new Product(name, description, Integer.parseInt(prize));
@@ -47,7 +50,15 @@ public class ProductController {
             model.addAttribute("name", p.getName());
             this.productsService.saveProduct(p);
             return "saveProduct";
-        } else return "unsavedProduct";
+        } else {
+            return "unsavedProduct";
+        }
+    }
+
+    @GetMapping("/product/{id}/image")
+    public ResponseEntity<Object> downloadImage(@PathVariable int id) throws MalformedURLException {
+
+        return imageService.createResponseFromImage(PRODUCTS_FOLDER, id);
     }
 
     @PostMapping("/followProduct")
@@ -72,7 +83,7 @@ public class ProductController {
         model.addAttribute("name", prod1.getName());
         model.addAttribute("price", prod1.getPrice());
         model.addAttribute("description", prod1.getDescription());
-        //model.addAttribute("image", prod1.getImage());
+        model.addAttribute("image", "/images/products/" + id + ".jpeg"); // Ruta de la imagen
 
         return "showProduct";
     }
