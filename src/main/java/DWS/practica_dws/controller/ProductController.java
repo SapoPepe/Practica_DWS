@@ -68,12 +68,18 @@ public class ProductController {
 
     @GetMapping("/product/{id}/delete")
     public String deleteProduct(Model model, @PathVariable long id) {
-        if(productsService.getProduct(id)!=null){
-            productsService.deleteProduct(id);
-        }
-        model.addAttribute("allProducts",productsService.getAll());
+        productsService.deleteProduct(id);
+
+        model.addAttribute("allProducts", productsService.getAll());
 
         return "deletedProduct";
+    }
+
+    @PostMapping("/removeProductFromCart")
+    public String removeProductFromCart(@RequestParam long id, Model model) {
+        productsService.removeProductFromCart(id, userSession);
+        model.addAttribute("products", userSession.userProducts());
+        return "shoppingCart";
     }
 
 }

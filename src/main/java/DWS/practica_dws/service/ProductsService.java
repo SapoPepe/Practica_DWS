@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class ProductsService {
@@ -37,13 +36,18 @@ public class ProductsService {
         return this.defaultProducts.get(id);
     }
 
-    public Product deleteProduct (long id){
-        if(this.defaultProducts.containsKey(id)){
-            Product product= this.getProduct(id);
+    public void deleteProduct (long id){
+        if(this.getProduct(id)!=null){
             this.defaultProducts.remove(id);
-            return product;
         }
-        return null;
+    }
+
+    public void removeProductFromCart(long id, UserSession userSession) {
+        Collection<Product> userProducts = userSession.userProducts();
+        Product productToRemove = this.getProduct(id);
+        if (productToRemove != null && userProducts.contains(productToRemove)) {
+            userProducts.remove(productToRemove);
+        }
     }
 
 }
