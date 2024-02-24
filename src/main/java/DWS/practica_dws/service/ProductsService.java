@@ -36,10 +36,13 @@ public class ProductsService {
         return this.defaultProducts.get(id);
     }
 
-    public void deleteProduct (long id){
-        if(this.getProduct(id)!=null){
+    public Product deleteProduct (long id){
+        if(this.defaultProducts.containsKey(id)){
+            Product product= this.getProduct(id);
             this.defaultProducts.remove(id);
+            return product;
         }
+        return null;
     }
 
     public void removeProductFromCart(long id, UserSession userSession) {
@@ -48,6 +51,14 @@ public class ProductsService {
         if (productToRemove != null && userProducts.contains(productToRemove)) {
             userProducts.remove(productToRemove);
         }
+    }
+
+    public boolean contains(Long id){
+        return this.defaultProducts.get(id)!=null;
+    }
+
+    public String getProductName(Long id){
+        return this.defaultProducts.get(id).getName();
     }
 
 }

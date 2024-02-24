@@ -20,7 +20,30 @@
         <input type="submit" value="Añadir">
     </form>
 
-    <a href="/product/{{id}}/delete">Borrar</a>
+    <form method="post" action="/product/{{id}}/delete">
+        <input type="submit" value="Borrar">
+    </form>
+
+    <br><br><br>
+    <form action="/product/{{id}}/newComment" method="post">
+        <p>Nombre de usuario: </p>
+        <input type="text" name="userName">
+        <p>Calificación: </p>
+        <input type="number" name="score" min="0" max="10" value="0">
+        <p>Comentario: </p>
+        <textarea name="comment" cols="30" rows="10"></textarea>
+        <input type="submit" value="Comentar">
+    </form>
+
+    <h3>Comentarios</h3>
+    {{#commentList}}
+        <p>{{userName}} {{score}}</p>
+        <p>{{comment}}</p>
+    {{/commentList}}
+    {{^commentList}}
+        <p>Se el primero en publicar un comentario</p>
+    {{/commentList}}
+
 
     <a href="/">Volver al inicio</a>
 </body>

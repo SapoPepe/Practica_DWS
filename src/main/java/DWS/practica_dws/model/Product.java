@@ -1,18 +1,24 @@
 package DWS.practica_dws.model;
 
 import java.awt.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Product {
     private long id;
     private double prize;
     private String description;
     private String name;
+    private Map<String, Comment> comments;
 
 
     public Product(String name, String description, double prize){
         this.name = name;
         this.description = description;
         this.prize = prize;
+        this.comments = new HashMap<>();
+
     }
 
     public void setID(Long l){
@@ -33,13 +39,12 @@ public class Product {
     public String getDescription() {
         return description;
     }
-    public void setPrice(double prize) {
-        this.prize = prize;
+
+    public void addComment(Comment c){
+        this.comments.put(c.getUser(), c);
     }
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    public void setName(String name) {
-        this.name = name;
+
+    public Collection<Comment> getComments(){
+        return this.comments.values();
     }
 }
