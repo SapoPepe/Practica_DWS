@@ -33,6 +33,13 @@ public class ProductController {
         return "index";
     }
 
+
+    @GetMapping("/newProduct")
+    public String showNewProductForm(){
+        return "newProduct";
+    }
+
+
     @PostMapping("/product/new")
     public String newProduct(Model model, @RequestParam String name, @RequestParam String description, @RequestParam(required = false) String prize) {
 
