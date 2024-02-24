@@ -5,7 +5,17 @@
     <title>Producto eliminado</title>
 </head>
 <body>
-    <p>El producto ha sido eliminado</p>
-    <a href="/">Voler al inicio</a>
+
+    {{#exist}}
+        <p>El producto {{product}} ha sido eliminado</p>
+        <a href="/">Voler al inicio</a>
+    {{/exist}}
+    {{^exist}}
+        <p>No se ha podido eliminar el producto indicado</p>
+        <a href="/">Voler al inicio</a>
+    {{/exist}}
+
+
+
 </body>
 </html>

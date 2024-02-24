@@ -102,11 +102,15 @@ public class ProductController {
         return "showProduct";
     }
 
-    @GetMapping("/product/{id}/delete")
+    @PostMapping("/product/{id}/delete")
     public String deleteProduct(Model model, @PathVariable long id) {
-        productsService.deleteProduct(id);
+        Product p = productsService.getProduct(id);
 
-        model.addAttribute("allProducts", productsService.getAll());
+        if(p!=null){
+            productsService.deleteProduct(id);
+            model.addAttribute("product", p.getName());
+            model.addAttribute("exist", true);
+        } else model.addAttribute("exist", false);
 
         return "deletedProduct";
     }
