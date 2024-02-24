@@ -4,12 +4,16 @@ import DWS.practica_dws.model.Product;
 import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.ProductsService;
 import DWS.practica_dws.service.UserSession;
+import jakarta.jws.WebParam;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Controller
 public class ProductController {
@@ -28,26 +32,40 @@ public class ProductController {
         return "index";
     }
 
+    @GetMapping("/newProduct")
+    public String showNewProductForm(Model model){
+        model.addAttribute("noPrincipals", false);
+        return "newProduct";
+    }
+
     @PostMapping("/product/new")
-    public String newProduct(Model model, HttpServletRequest request) {
+    public String newProduct(Model model, @RequestParam String name, @RequestParam String description, @RequestParam(required = false) String prize) {
 
         Product p;
-        String name = request.getParameter("name");
-        String description = request.getParameter("description");
-        String prize = request.getParameter("prize");
 
-        //If it doens't have the principal of the product
-        if(name!=null && Integer.parseInt(prize)>=0){
-            if(description!=null){
-                p = new Product(name, "Producto sin descripción", Integer.parseInt(prize));
-            } else {
-                p = new Product(name, description, Integer.parseInt(prize));
+        try{
+            double prizeD = Double.parseDouble(prize);
+            //If it doens't have the principal of the product
+            if(!name.isEmpty() && prizeD>=0){
+                if(description!=null){
+                    p = new Product(name, "Producto sin descripción", prizeD);
+                } else {
+                    p = new Product(name, description, prizeD);
+                }
+
+                model.addAttribute("name", name);
+                this.productsService.saveProduct(p);
+                return "saveProduct";
+            } else{
+                model.addAttribute("noPrincipals", true);
+                return "newProduct";
             }
 
-            model.addAttribute("name", p.getName());
-            this.productsService.saveProduct(p);
-            return "saveProduct";
-        } else return "unsavedProduct";
+        } catch (NumberFormatException e){
+            model.addAttribute("noPrincipals", true);
+            return "newProduct";
+        }
+
     }
 
     @PostMapping("/followProduct")
