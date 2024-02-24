@@ -5,20 +5,20 @@
     <title>Incluir producto</title>
 </head>
 <body>
-    {{#noPrincipals}}
-    <p><b>No se han rellenado la información mínima requerida</b></p>
-    {{/noPrincipals}}
+{{#noPrincipals}}
+<p><b>No se han rellenado la información mínima requerida</b></p>
+{{/noPrincipals}}
 
-    <form action="/product/new" method="post">
-        <p>Nombre: </p>
-        <input type='text' name='name'/>
-        <p>Precio:</p>
-        <input type='number' min="0" name='prize'/>
-        <p>Descripción:</p>
-        <textarea name='description' rows=5 cols=40></textarea>
-        <p>Imagen:</p>
-        <input type="file" accept=".jpg, .jpeg, .png">
-        <input type='submit' value='Subir'/>
-    </form>
+<form action="/product/new" method="post">
+    <p>Nombre: </p>
+    <input type='text' name='name'/>
+    <p>Precio:</p>
+    <input type='number' min="0" name='prize'/>
+    <p>Descripción:</p>
+    <textarea name='description' rows=5 cols=40></textarea>
+    <p>Imagen:</p>
+    <input type="file" accept=".jpg, .jpeg, .png">
+    <input type='submit' value='Subir'/>
+</form>
 </body>
 </html>

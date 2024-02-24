@@ -34,24 +34,31 @@ public class ProductController {
     }
 
     @PostMapping("/product/new")
-    public String newProduct(Model model, HttpServletRequest request, @RequestParam("image") MultipartFile image) {
-        Product p;
-        String name = request.getParameter("name");
-        String description = request.getParameter("description");
-        String prize = request.getParameter("prize");
+    public String newProduct(Model model, @RequestParam String name, @RequestParam String description, @RequestParam(required = false) String prize) {
 
-        if (name != null && Integer.parseInt(prize) >= 0) {
-            if (description == null) {
-                p = new Product(name, "Producto sin descripción", Integer.parseInt(prize));
-            } else {
-                p = new Product(name, description, Integer.parseInt(prize));
+        Product p;
+
+        try{
+            double prizeD = Double.parseDouble(prize);
+            //If it doens't have the principal of the product
+            if(!name.isEmpty() && prizeD>=0){
+                if(description!=null){
+                    p = new Product(name, "Producto sin descripción", prizeD);
+                } else {
+                    p = new Product(name, description, prizeD);
+                }
+
+                model.addAttribute("name", name);
+                this.productsService.saveProduct(p);
+                return "saveProduct";
+            } else{
+                model.addAttribute("noPrincipals", true);
+                return "newProduct";
             }
 
-            model.addAttribute("name", p.getName());
-            this.productsService.saveProduct(p);
-            return "saveProduct";
-        } else {
-            return "unsavedProduct";
+        } catch (NumberFormatException e){
+            model.addAttribute("noPrincipals", true);
+            return "newProduct";
         }
     }
 
