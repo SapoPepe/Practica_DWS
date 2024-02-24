@@ -1,9 +1,11 @@
 package DWS.practica_dws.controller;
 
+import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.Product;
 import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.ProductsService;
 import DWS.practica_dws.service.UserSession;
+import jakarta.jws.WebParam;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +100,7 @@ public class ProductController {
         model.addAttribute("price", prod1.getPrice());
         model.addAttribute("description", prod1.getDescription());
         model.addAttribute("image", "/images/products/" + id + ".jpeg"); // Ruta de la imagen
+        model.addAttribute("commentList", prod1.getComments());
 
         return "showProduct";
     }
@@ -120,6 +123,22 @@ public class ProductController {
         productsService.removeProductFromCart(id, userSession);
         model.addAttribute("products", userSession.userProducts());
         return "shoppingCart";
+    }
+
+
+    @PostMapping("/product/{id}/newComment")
+    public String newComment(Model model, @PathVariable long id, @RequestParam String userName,
+                             @RequestParam int score, @RequestParam String comment){
+        Product p = productsService.getProduct(id);
+        if(p!=null){
+            p.addComment(new Comment(userName, score, comment));
+            model.addAttribute("name", p.getName());
+            model.addAttribute("price", p.getPrice());
+            model.addAttribute("description", p.getDescription());
+            model.addAttribute("image", "/images/products/" + id + ".jpeg"); // Ruta de la imagen
+            model.addAttribute("commentList", p.getComments());
+        }
+        return "showProduct";
     }
 
 }
