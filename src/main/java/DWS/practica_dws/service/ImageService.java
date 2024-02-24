@@ -22,15 +22,15 @@ public class ImageService {
 	private static final Path FILES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
 	private Path createFilePath(long imageId, Path folder) {
-		return folder.resolve("image-" + imageId + ".jpg");
+		return folder.resolve(imageId + ".jpeg");
 	}
-	
+
 	public void saveImage(String folderName, long imageId, MultipartFile image) throws IOException {
 
 		Path folder = FILES_FOLDER.resolve(folderName);
 
 		Files.createDirectories(folder);
-		
+
 		Path newFile = createFilePath(imageId, folder);
 
 		image.transferTo(newFile);
@@ -39,16 +39,16 @@ public class ImageService {
 	public ResponseEntity<Object> createResponseFromImage(String folderName, long imageId) throws MalformedURLException {
 
 		Path folder = FILES_FOLDER.resolve(folderName);
-		
+
 		Path imagePath = createFilePath(imageId, folder);
-		
+
 		Resource file = new UrlResource(imagePath.toUri());
-		
+
 		if(!Files.exists(imagePath)) {
 			return ResponseEntity.notFound().build();
 		} else {
 			return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg").body(file);
-		}		
+		}
 	}
 
 	public void deleteImage(String folderName, long imageId) throws IOException {
@@ -56,7 +56,7 @@ public class ImageService {
 		Path folder = FILES_FOLDER.resolve(folderName);
 
 		Path imageFile = createFilePath(imageId, folder);
-		
-		Files.deleteIfExists(imageFile);				
+
+		Files.deleteIfExists(imageFile);
 	}
 }

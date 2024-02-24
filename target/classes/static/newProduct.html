@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Incluir producto</title>
+</head>
+<body>
+    <form action="product/new" method="post">
+        <p>Nombre: </p>
+        <input type='text' name='name' required/>
+        <p>Precio:</p>
+        <input type='number' min="0" name='prize' required/>
+        <p>Descripción:</p>
+        <textarea name='description' rows=5 cols=40></textarea>
+        <p>Imagen (solo jpeg):</p>
+        <input type="file" accept=".jpg, .jpeg, .png">
+        <input type='submit' value='Subir'/>
+    </form>
+</body>
+</html>

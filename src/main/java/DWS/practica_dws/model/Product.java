@@ -19,6 +19,10 @@ public class Product {
         this.id = l;
     }
 
+    public long getId() {
+        return this.id;
+    }
+
     public String getName(){
         return this.name;
     }
