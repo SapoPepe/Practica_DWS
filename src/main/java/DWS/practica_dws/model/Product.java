@@ -3,6 +3,7 @@ package DWS.practica_dws.model;
 import java.util.*;
 
 public class Product {
+    //Each product have an ID
     private long id;
     private double prize;
     private String description;
