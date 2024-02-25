@@ -12,7 +12,7 @@
         <input type="text" id="productName" name="productName">
         <input type="submit" value="Buscar">
     </form>
-
+    <hr>
 
     {{#products}}
     <form method="post" action="/followProduct?id={{id}}">
@@ -26,7 +26,9 @@
     {{^products}}
         <p>No hay ningún producto</p>
     {{/products}}
-    <a href="/newProduct">Subir producto</a>
+
+    <hr>
+    <form action="/newProduct" method="get"><input type="submit" value="Subir producto"></form>
     <form action="/shoppingCart" method="get"><input type="submit" value="Carrtio"></form>
 </body>
 </html>

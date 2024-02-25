@@ -25,6 +25,8 @@
     </form>
 
     <br><br><br>
+
+    <h3>Comentarios</h3>
     <form action="/product/{{id}}/newComment" method="post">
         <p>Nombre de usuario: </p>
         <input type="text" name="userName">
@@ -35,17 +37,14 @@
         <input type="submit" value="Comentar">
     </form>
 
-    <h3>Comentarios</h3>
     {{#commentList}}
-        <p>{{userName}} {{score}}</p>
+        <h5>{{userName}} - {{score}}</h5>
         <p>{{opinion}}</p>
     {{/commentList}}
     {{^commentList}}
         <p>Se el primero en publicar un comentario</p>
     {{/commentList}}
 
-
-    <a href="/">Volver al inicio</a>
 </body>
 
 </html>
