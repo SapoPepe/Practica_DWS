@@ -3,9 +3,7 @@ package DWS.practica_dws.service;
 import DWS.practica_dws.model.Product;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ProductsService {
@@ -59,6 +57,16 @@ public class ProductsService {
 
     public String getProductName(Long id){
         return this.defaultProducts.get(id).getName();
+    }
+
+    public List<Product> getProductsByName(String productName) {
+        List<Product> matchingProducts = new ArrayList<>();
+        for (Product product : this.defaultProducts.values()) {
+            if (product.getName().toLowerCase().contains(productName.toLowerCase())) {
+                matchingProducts.add(product);
+            }
+        }
+        return matchingProducts; // Devuelve una lista de productos cuyo nombre contiene la cadena de búsqueda
     }
 
 }

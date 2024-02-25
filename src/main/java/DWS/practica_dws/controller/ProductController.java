@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 
 @Controller
 public class ProductController {
@@ -139,6 +140,13 @@ public class ProductController {
             model.addAttribute("commentList", p.getComments());
         }
         return "showProduct";
+    }
+
+    @GetMapping("/searchProduct")
+    public String searchProduct(Model model, @RequestParam String productName) {
+        List<Product> matchingProducts = productsService.getProductsByName(productName);
+        model.addAttribute("products", matchingProducts);
+        return "searchResults";
     }
 
 }

@@ -6,12 +6,20 @@
 </head>
 <body>
     <h2>Productos</h2>
+
+    <form action="/searchProduct" method="get">
+        <label for="productName">Nombre del producto :</label><br>
+        <input type="text" id="productName" name="productName">
+        <input type="submit" value="Buscar">
+    </form>
+
+
     {{#products}}
     <form method="post" action="/followProduct?id={{id}}">
         <p>{{id}} - {{name}} <br> {{prize}}</p>
         <a href="/product/{{id}}">
             <img src="http://127.0.0.1:8080/product/{{id}}/image" width="500px" height="500px" />
-        </a>
+        </a><br>
         <input type="submit" value="Añadir">
     </form>
     {{/products}}
