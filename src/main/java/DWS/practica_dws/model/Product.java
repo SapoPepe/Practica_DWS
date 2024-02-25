@@ -17,7 +17,6 @@ public class Product {
         this.description = description;
         this.prize = prize;
         this.comments = new HashMap<>();
-
     }
 
     public void setID(Long l){
@@ -45,5 +44,11 @@ public class Product {
 
     public Collection<Comment> getComments(){
         return this.comments.values();
+    }
+
+    public void updateInfo(String name, String description, double prize){
+        this.name = name;
+        this.description = description;
+        this.prize = prize;
     }
 }

@@ -44,7 +44,8 @@ public class ProductController {
 
 
     @PostMapping("/product/new")
-    public String newProduct(Model model, @RequestParam String name, @RequestParam String description, @RequestParam(required = false) String prize) {
+    public String newProduct(Model model, @RequestParam String name, @RequestParam String description,
+                             @RequestParam(required = false) String prize) {
 
         Product p;
 
@@ -112,6 +113,22 @@ public class ProductController {
         } else model.addAttribute("exist", false);
 
         return "deletedProduct";
+    }
+
+    @PostMapping("/product/{id}/edit")
+    public String showEditForm(Model model, @PathVariable long id) {
+        Product p = productsService.getProduct(id);
+        model.addAttribute("product", p);
+        return "editProduct";
+    }
+
+    @PostMapping("/product/{id}/modify")
+    public String editProduct(Model model, @PathVariable long id, @RequestParam(required = false) String name,
+                              @RequestParam(required = false) double prize, @RequestParam(required = false) String description) {
+        Product p = productsService.getProduct(id);
+        p.updateInfo(name, description, prize);
+        model.addAttribute("product", p);
+        return "showProduct";
     }
 
     @PostMapping("/removeProductFromCart")
