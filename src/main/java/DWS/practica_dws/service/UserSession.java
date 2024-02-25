@@ -19,11 +19,27 @@ public class UserSession {
 
     public void follow(Product p){
         this.user.followProduct(p);
+        p.addUsers(this.user);
+    }
+
+    public void unfollow(Product productToRemove){
+        Collection<Product> userProducts = this.user.cartProducts();
+
+        if (productToRemove != null && userProducts.contains(productToRemove)) {
+            userProducts.remove(productToRemove);
+            this.user.unfollowProduct(productToRemove);
+            productToRemove.removeUsers(this.user);
+        }
     }
 
     public Collection<Product> userProducts(){
         return this.user.cartProducts();
     }
+
+    public User getUser(){
+        return this.user;
+    }
+
 
 
 }

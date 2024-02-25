@@ -11,6 +11,10 @@ public class User {
         this.userProducts.add(p);
     }
 
+    public void unfollowProduct(Product p){
+        this.userProducts.remove(p);
+    }
+
     public Collection<Product> cartProducts(){
         return this.userProducts;
     }

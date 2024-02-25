@@ -1,6 +1,7 @@
 package DWS.practica_dws.service;
 
 import DWS.practica_dws.model.Product;
+import DWS.practica_dws.model.User;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -44,11 +45,8 @@ public class ProductsService {
     }
 
     public void removeProductFromCart(long id, UserSession userSession) {
-        Collection<Product> userProducts = userSession.userProducts();
         Product productToRemove = this.getProduct(id);
-        if (productToRemove != null && userProducts.contains(productToRemove)) {
-            userProducts.remove(productToRemove);
-        }
+        userSession.unfollow(productToRemove);
     }
 
     public boolean contains(Long id){
