@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{name}}</title>
+    <title>{{product.name}}</title>
 </head>
 
 <header class="header">
     <a href="/">Home</a>
-    <title>{{name}}</title>
+    <title>{{product.name}}</title>
 </header>
 
 <body>
-    <h2>{{name}}</h2><br>
-    <h3>Precio: {{price}}</h3><br>
-    <img src="/products/{{id}}.jpeg" width="500px" height="500px" />
-    <p>{{description}}</p><br>
+    <h2>{{product.name}}</h2><br>
+    <h3>Precio: {{product.price}}</h3><br>
+    <img src="/products/{{product.id}}/image" width="500px" height="500px" />
+    <p>{{product.description}}</p><br>
 
     <form method="post" action="/followProduct?id={{id}}">
         <input type="submit" value="Añadir">
@@ -31,14 +31,14 @@
         <p>Calificación: </p>
         <input type="number" name="score" min="0" max="10" value="0">
         <p>Comentario: </p>
-        <textarea name="comment" cols="30" rows="10"></textarea>
+        <textarea name="opinion" cols="30" rows="10"></textarea>
         <input type="submit" value="Comentar">
     </form>
 
     <h3>Comentarios</h3>
     {{#commentList}}
         <p>{{userName}} {{score}}</p>
-        <p>{{comment}}</p>
+        <p>{{opinion}}</p>
     {{/commentList}}
     {{^commentList}}
         <p>Se el primero en publicar un comentario</p>

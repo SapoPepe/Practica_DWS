@@ -96,12 +96,7 @@ public class ProductController {
     @GetMapping("/product/{id}")
     public String showProduct(Model model, @PathVariable Long id){
         Product prod1 = productsService.getProduct(id);
-
-        model.addAttribute("name", prod1.getName());
-        model.addAttribute("price", prod1.getPrice());
-        model.addAttribute("description", prod1.getDescription());
-        model.addAttribute("image", "/images/products/" + id + ".jpeg"); // Ruta de la imagen
-        model.addAttribute("commentList", prod1.getComments());
+        model.addAttribute("product", prod1);
 
         return "showProduct";
     }
@@ -129,14 +124,11 @@ public class ProductController {
 
     @PostMapping("/product/{id}/newComment")
     public String newComment(Model model, @PathVariable long id, @RequestParam String userName,
-                             @RequestParam int score, @RequestParam String comment){
+                             @RequestParam int score, @RequestParam String opinion){
         Product p = productsService.getProduct(id);
         if(p!=null){
-            p.addComment(new Comment(userName, score, comment));
-            model.addAttribute("name", p.getName());
-            model.addAttribute("price", p.getPrice());
-            model.addAttribute("description", p.getDescription());
-            model.addAttribute("image", "/images/products/" + id + ".jpeg"); // Ruta de la imagen
+            p.addComment(new Comment(userName, score, opinion));
+            model.addAttribute("product", p);
             model.addAttribute("commentList", p.getComments());
         }
         return "showProduct";

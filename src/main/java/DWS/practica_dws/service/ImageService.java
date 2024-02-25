@@ -37,13 +37,9 @@ public class ImageService {
 	}
 
 	public ResponseEntity<Object> createResponseFromImage(String folderName, long imageId) throws MalformedURLException {
-
 		Path folder = FILES_FOLDER.resolve(folderName);
-
 		Path imagePath = createFilePath(imageId, folder);
-
 		Resource file = new UrlResource(imagePath.toUri());
-
 		if(!Files.exists(imagePath)) {
 			return ResponseEntity.notFound().build();
 		} else {
