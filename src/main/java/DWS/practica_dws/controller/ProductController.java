@@ -74,8 +74,6 @@ public class ProductController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-//        imageService.saveImage();
     }
 
     @GetMapping("/product/{id}/image")
@@ -108,11 +106,16 @@ public class ProductController {
     }
 
     @PostMapping("/product/{id}/delete")
-    public String deleteProduct(Model model, @PathVariable long id) {
+    public String deleteProduct(Model model, @PathVariable long id) throws IOException {
         Product p = productsService.getProduct(id);
 
         if(p!=null){
             productsService.deleteProduct(id);
+            try {
+                imageService.deleteImage(PRODUCTS_FOLDER, p.getId());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             model.addAttribute("product", p.getName());
             model.addAttribute("exist", true);
         } else model.addAttribute("exist", false);
