@@ -42,6 +42,12 @@ public class Product {
     public String getDescription() {
         return description;
     }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public int getNumProductsInCarts() {
+        return numProductsInCarts;
+    }
 
     public void addComment(Comment c){
         c.setID(this.comments.size());
@@ -57,10 +63,14 @@ public class Product {
     }
 
     public void updateInfo(String name, String description, double prize){
-        this.name = name;
-        this.description = description;
-        this.prize = prize;
-    }
+        if(name!=null){
+            this.name = name;
+        }if(prize!=0){
+            this.prize = prize;
+        }if(description!= null){
+            this.description = description;
+        }
+     }
 
     public void removeUsers(User u){
         this.inUsersShoppingCart.remove(u);

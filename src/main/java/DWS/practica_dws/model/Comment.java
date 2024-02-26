@@ -15,4 +15,36 @@ public class Comment {
     public void setID(int CID){
         this.CID = CID;
     }
+
+    public int getCID() {
+        return CID;
+    }
+
+    public void setCID(int CID) {
+        this.CID = CID;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public String getOpinion() {
+        return opinion;
+    }
+
+    public void setOpinion(String opinion) {
+        this.opinion = opinion;
+    }
 }
