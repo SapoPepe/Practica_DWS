@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 
 @Service
 public class ImageService {
-
 	private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
 	private Path createFilePath(long imageId, Path folder) {
@@ -33,6 +32,17 @@ public class ImageService {
 		model.addAttribute("imageId", String.valueOf(productId));
 	}
 
+	public void deleteImage(String folderName, long imageId) throws IOException {
+		Path folder = IMAGES_FOLDER.resolve(folderName);
+		Path imageFile = createFilePath(imageId, folder);
+		Files.deleteIfExists(imageFile);
+	}
+
+	public void modifyImage(String folderName, long productId, MultipartFile newImage, Model model) throws IOException {
+		deleteImage(folderName, productId);
+		saveImage(folderName, productId, newImage, model);
+	}
+
 	public ResponseEntity<Object> createResponseFromImage(String folderName, long imageId) throws MalformedURLException {
 		Path folder = IMAGES_FOLDER.resolve(folderName);
 		Path imagePath = createFilePath(imageId, folder);
@@ -43,15 +53,4 @@ public class ImageService {
 			return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg").body(file);
 		}
 	}
-//
-//
-//
-//	public void deleteImage(String folderName, long imageId) throws IOException {
-//
-//		Path folder = FILES_FOLDER.resolve(folderName);
-//
-//		Path imageFile = createFilePath(imageId, folder);
-//
-//		Files.deleteIfExists(imageFile);
-//	}
 }

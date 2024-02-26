@@ -35,7 +35,7 @@ public class ProductsService {
         return this.defaultProducts.get(id);
     }
 
-    public Product deleteProduct (long id){
+    public Product deleteProduct(long id){
         if(this.defaultProducts.containsKey(id)){
             Product product= this.getProduct(id);
             this.defaultProducts.remove(id);
