@@ -19,25 +19,22 @@ import java.nio.file.Paths;
 @Service
 public class ImageService {
 
-	private static final Path FILES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
+	private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
 	private Path createFilePath(long imageId, Path folder) {
 		return folder.resolve(imageId + ".jpeg");
 	}
 
-	public void saveImage(String folderName, long imageId, MultipartFile image) throws IOException {
-
-		Path folder = FILES_FOLDER.resolve(folderName);
-
+	public void saveImage(String folderName, long productId, MultipartFile image, Model model) throws IOException {
+		Path folder = IMAGES_FOLDER.resolve("products");
 		Files.createDirectories(folder);
-
-		Path newFile = createFilePath(imageId, folder);
-
-		image.transferTo(newFile);
+		Path imagePath = folder.resolve(String.valueOf(productId) + ".jpeg");
+		image.transferTo(imagePath);
+		model.addAttribute("imageId", String.valueOf(productId));
 	}
 
 	public ResponseEntity<Object> createResponseFromImage(String folderName, long imageId) throws MalformedURLException {
-		Path folder = FILES_FOLDER.resolve(folderName);
+		Path folder = IMAGES_FOLDER.resolve(folderName);
 		Path imagePath = createFilePath(imageId, folder);
 		Resource file = new UrlResource(imagePath.toUri());
 		if(!Files.exists(imagePath)) {
@@ -46,13 +43,15 @@ public class ImageService {
 			return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg").body(file);
 		}
 	}
-
-	public void deleteImage(String folderName, long imageId) throws IOException {
-
-		Path folder = FILES_FOLDER.resolve(folderName);
-
-		Path imageFile = createFilePath(imageId, folder);
-
-		Files.deleteIfExists(imageFile);
-	}
+//
+//
+//
+//	public void deleteImage(String folderName, long imageId) throws IOException {
+//
+//		Path folder = FILES_FOLDER.resolve(folderName);
+//
+//		Path imageFile = createFilePath(imageId, folder);
+//
+//		Files.deleteIfExists(imageFile);
+//	}
 }

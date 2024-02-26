@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{product.name}}</title>
+</head>
+
+<header class="header">
+    <a href="/">Home</a>
+    <title>{{product.name}}</title>
+</header>
+
+<body>
+    <h2>{{product.name}}</h2><br>
+    <h3>Precio: {{product.price}}</h3><br>
+    <img src="/products/{{product.id}}/image" width="500px" height="500px" />
+    <p>{{product.description}}</p><br>
+
+    <form method="post" action="/followProduct?id={{id}}">
+        <input type="submit" value="Añadir">
+    </form>
+
+    <form method="post" action="/product/{{id}}/delete">
+        <input type="submit" value="Borrar">
+    </form>
+
+    <form action="/product/{{id}}/edit" method="post">
+        <input type="submit" value="Editar">
+    </form>
+
+    <br><br><br>
+
+    <h3>Comentarios</h3>
+    <form action="/product/{{id}}/newComment" method="post">
+        <p>Nombre de usuario: </p>
+        <input type="text" name="userName">
+        <p>Calificación: </p>
+        <input type="number" name="score" min="0" max="10" value="0">
+        <p>Comentario: </p>
+        <textarea name="opinion" cols="30" rows="10"></textarea>
+        <input type="submit" value="Comentar">
+    </form>
+
+    {{#commentList}}
+        <h5>{{userName}} - {{score}}</h5>
+        <p>{{opinion}}</p>
+        <form action="/product/{{id}}/comment/{{CID}}" method="post"><input type="submit" value="Borrar"></form>
+    {{/commentList}}
+    {{^commentList}}
+        <p>Se el primero en publicar un comentario</p>
+    {{/commentList}}
+
+</body>
+
+</html>
+
+

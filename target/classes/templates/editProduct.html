@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar producto</title>
+</head>
+<body>
+<form action="/product/{{id}}/modify" method="post">
+    <p>Nombre: </p>
+    <input type='text' name='name' value="{{product.name}}"/>
+    <p>Precio:</p>
+    <input type='number' min="0" name='prize' value="{{product.prize}}"/>
+    <p>Descripción:</p>
+    <textarea name='description' rows=5 cols=40>{{product.description}}</textarea>
+    <p>Imagen:</p>
+    <input type="file" accept=".jpg, .jpeg, .png">
+    <input type='submit' value='Editar'/>
+    <a href="/product/{{id}}">Cancelar</a>
+</form>
+</body>
+</html>

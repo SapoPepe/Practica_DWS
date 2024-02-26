@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <h2>Productos</h2>
+
+    <form action="/searchProduct" method="get">
+        <label for="productName">Nombre del producto :</label><br>
+        <input type="text" id="productName" name="productName">
+        <input type="submit" value="Buscar">
+    </form>
+    <hr>
+
+    {{#products}}
+    <form method="post" action="/followProduct?id={{id}}">
+        <p>{{id}} - {{name}} <br> {{prize}}</p>
+        <p>Usuarios que lo añadieron a la cesta: {{numProductsInCarts}}</p>
+        <a href="/product/{{id}}">
+            <img src="http://127.0.0.1:8080/product/{{id}}/image" width="500px" height="500px" />
+        </a><br>
+        <input type="submit" value="Añadir">
+    </form>
+    {{/products}}
+    {{^products}}
+        <p>No hay ningún producto</p>
+    {{/products}}
+
+    <hr>
+    <form action="/newProduct" method="get"><input type="submit" value="Subir producto"></form>
+    <form action="/shoppingCart" method="get"><input type="submit" value="Carrtio"></form>
+</body>
+</html>

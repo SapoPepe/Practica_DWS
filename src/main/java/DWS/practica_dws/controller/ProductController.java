@@ -45,7 +45,7 @@ public class ProductController {
 
     @PostMapping("/product/new")
     public String newProduct(Model model, @RequestParam String name, @RequestParam String description,
-                             @RequestParam(required = false) String prize) {
+                             @RequestParam(required = false) String prize, @RequestParam MultipartFile image) {
 
         Product p;
 
@@ -61,6 +61,7 @@ public class ProductController {
 
                 model.addAttribute("name", name);
                 this.productsService.saveProduct(p);
+                imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
                 return "saveProduct";
             } else{
                 model.addAttribute("noPrincipals", true);
@@ -70,7 +71,11 @@ public class ProductController {
         } catch (NumberFormatException e){
             model.addAttribute("noPrincipals", true);
             return "newProduct";
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
+//        imageService.saveImage();
     }
 
     @GetMapping("/product/{id}/image")
