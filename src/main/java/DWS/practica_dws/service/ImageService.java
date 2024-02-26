@@ -38,6 +38,11 @@ public class ImageService {
 		Files.deleteIfExists(imageFile);
 	}
 
+	public void modifyImage(String folderName, long productId, MultipartFile newImage, Model model) throws IOException {
+		deleteImage(folderName, productId);
+		saveImage(folderName, productId, newImage, model);
+	}
+
 	public ResponseEntity<Object> createResponseFromImage(String folderName, long imageId) throws MalformedURLException {
 		Path folder = IMAGES_FOLDER.resolve(folderName);
 		Path imagePath = createFilePath(imageId, folder);

@@ -132,10 +132,21 @@ public class ProductController {
 
     @PostMapping("/product/{id}/modify")
     public String editProduct(Model model, @PathVariable long id, @RequestParam(required = false) String name,
-                              @RequestParam(required = false) double prize, @RequestParam(required = false) String description) {
+                              @RequestParam(required = false) double prize, @RequestParam(required = false) String description,
+                              @RequestParam(required = false) MultipartFile image) {
         Product p = productsService.getProduct(id);
         p.updateInfo(name, description, prize);
         model.addAttribute("product", p);
+
+        try {
+            if (image != null && !image.isEmpty()) {
+                imageService.modifyImage("products", id, image, model);
+            }
+        } catch (IOException e) {
+            // Handle exception
+            e.printStackTrace();
+        }
+
         return "showProduct";
     }
 
