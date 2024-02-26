@@ -1,7 +1,7 @@
 package DWS.practica_dws.model;
 
 public class Comment {
-    private long CID;
+    private int CID;
     private String userName;
     private int score;
     private String opinion;
@@ -12,7 +12,7 @@ public class Comment {
         this.opinion = opinion;
     }
 
-    public String getUser(){
-        return this.userName;
+    public void setID(int CID){
+        this.CID = CID;
     }
 }

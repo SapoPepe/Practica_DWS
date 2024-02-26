@@ -151,6 +151,19 @@ public class ProductController {
         return "showProduct";
     }
 
+    @PostMapping("/product/{id}/comment/{CID}")
+    public String deleteComment(Model model, @PathVariable long id, @PathVariable int CID) {
+        Product p = productsService.getProduct(id);
+
+        if(p!=null){
+            p.removeComment(CID);
+            model.addAttribute("product", p);
+            model.addAttribute("commentList", p.getComments());
+        }
+
+        return "showProduct";
+    }
+
     @GetMapping("/searchProduct")
     public String searchProduct(Model model, @RequestParam String productName) {
         List<Product> matchingProducts = productsService.getProductsByName(productName);

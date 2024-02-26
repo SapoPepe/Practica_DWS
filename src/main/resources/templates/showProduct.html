@@ -44,6 +44,7 @@
     {{#commentList}}
         <h5>{{userName}} - {{score}}</h5>
         <p>{{opinion}}</p>
+        <form action="/product/{{id}}/comment/{{CID}}" method="post"><input type="submit" value="Borrar"></form>
     {{/commentList}}
     {{^commentList}}
         <p>Se el primero en publicar un comentario</p>

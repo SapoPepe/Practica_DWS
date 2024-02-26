@@ -44,7 +44,12 @@ public class Product {
     }
 
     public void addComment(Comment c){
+        c.setID(this.comments.size());
         this.comments.add(c);
+    }
+
+    public void removeComment(int CID){
+        this.comments.remove(CID);
     }
 
     public Collection<Comment> getComments(){
