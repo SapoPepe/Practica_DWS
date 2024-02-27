@@ -6,7 +6,7 @@
 </head>
 <body>
     {{#products}}
-    <p>{{name}} {{prize}} <br>{{description}}</p>
+    <p>{{name}} {{price}} <br>{{description}}</p>
     <form method="post" action="/removeProductFromCart?id={{id}}">
         <input type="submit" value="Eliminar">
     </form>
