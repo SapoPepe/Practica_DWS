@@ -68,7 +68,11 @@ public class Product {
         }if(price!=0){
             this.price = price;
         }if(description!= null){
-            this.description = description;
+            if(description.isEmpty()){
+                this.description = "Producto sin descripción";
+            }else{
+                this.description = description;
+            }
         }
      }
 
