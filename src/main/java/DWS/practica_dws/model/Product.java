@@ -62,6 +62,10 @@ public class Product {
         return this.comments;
     }
 
+    public List<User> getInUsersShoppingCart() {
+        return inUsersShoppingCart;
+    }
+
     public void updateInfo(String name, String description, double price){
         if(name!=null){
             this.name = name;

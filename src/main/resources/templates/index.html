@@ -17,7 +17,6 @@
     {{#products}}
     <form method="post" action="/followProduct?id={{id}}">
         <p>{{id}} - {{name}} <br> {{price}}</p>
-        <p>Usuarios que lo añadieron a la cesta: {{numProductsInCarts}}</p>
         <a href="/product/{{id}}">
             <img src="/product/{{id}}/image" width="500px" height="500px" />
         </a><br>
