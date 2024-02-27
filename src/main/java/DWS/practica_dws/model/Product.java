@@ -8,17 +8,17 @@ public class Product {
     //Each product have an ID
     private long id;
     private int numProductsInCarts;
-    private double prize;
+    private double price;
     private String description;
     private String name;
     private List<Comment> comments;
     private List<User> inUsersShoppingCart;
 
 
-    public Product(String name, String description, double prize){
+    public Product(String name, String description, double price){
         this.name = name;
         this.description = description;
-        this.prize = prize;
+        this.price = price;
         this.numProductsInCarts = 0;
         this.comments = new ArrayList<>();
         this.inUsersShoppingCart = new ArrayList<>();
@@ -37,7 +37,7 @@ public class Product {
     }
 
     public double getPrice() {
-        return prize;
+        return price;
     }
     public String getDescription() {
         return description;
@@ -62,11 +62,11 @@ public class Product {
         return this.comments;
     }
 
-    public void updateInfo(String name, String description, double prize){
+    public void updateInfo(String name, String description, double price){
         if(name!=null){
             this.name = name;
-        }if(prize!=0){
-            this.prize = prize;
+        }if(price!=0){
+            this.price = price;
         }if(description!= null){
             this.description = description;
         }

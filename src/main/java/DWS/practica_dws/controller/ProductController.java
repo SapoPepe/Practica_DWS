@@ -5,8 +5,6 @@ import DWS.practica_dws.model.Product;
 import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.ProductsService;
 import DWS.practica_dws.service.UserSession;
-import jakarta.jws.WebParam;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,18 +43,18 @@ public class ProductController {
 
     @PostMapping("/product/new")
     public String newProduct(Model model, @RequestParam String name, @RequestParam String description,
-                             @RequestParam(required = false) String prize, @RequestParam MultipartFile image) {
+                             @RequestParam(required = false) String price, @RequestParam MultipartFile image) {
 
         Product p;
 
         try{
-            double prizeD = Double.parseDouble(prize);
+            double priceD = Double.parseDouble(price);
             //If it doens't have the principal of the product
-            if(!name.isEmpty() && prizeD>=0){
+            if(!name.isEmpty() && priceD>=0){
                 if(description!=null){
-                    p = new Product(name, "Producto sin descripción", prizeD);
+                    p = new Product(name, "Producto sin descripción", priceD);
                 } else {
-                    p = new Product(name, description, prizeD);
+                    p = new Product(name, description, priceD);
                 }
 
                 model.addAttribute("name", name);
