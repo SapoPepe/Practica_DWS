@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <link rel="stylesheet" href="/css/index-style.css">
 </head>
 <body>
-    <h2>Productos</h2>
-
-    <form action="/searchProduct" method="get">
-        <label for="productName">Nombre del producto :</label><br>
-        <input type="text" id="productName" name="productName">
-        <input type="submit" value="Buscar">
-    </form>
-    <hr>
-
+<div>
+        <form action="/searchProduct" method="get">
+            <label for="productName">Nombre del producto :</label><br>
+            <input type="text" id="productName" name="productName">
+            <input type="submit" value="Buscar">
+        </form>
+        <hr>
+</div>
     {{#products}}
     <form method="post" action="/followProduct?id={{id}}">
         <p>{{id}} - {{name}} <br> {{prize}}</p>
         <p>Usuarios que lo añadieron a la cesta: {{numProductsInCarts}}</p>
         <a href="/product/{{id}}">
-            <img src="http://localhost:8080/product/{{id}}/image" width="500px" height="500px" />
+            <img src="/product/{{id}}/image" width="500px" height="500px" />
         </a><br>
         <input type="submit" value="Añadir">
     </form>
