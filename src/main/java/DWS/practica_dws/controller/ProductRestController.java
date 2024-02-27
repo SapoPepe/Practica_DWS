@@ -2,7 +2,9 @@ package DWS.practica_dws.controller;
 
 import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.CustomError;
+import DWS.practica_dws.model.Image;
 import DWS.practica_dws.model.Product;
+import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.ProductsService;
 import DWS.practica_dws.service.UserSession;
 import jakarta.servlet.http.HttpSession;
@@ -12,7 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Collection;
 
 @RestController
@@ -22,7 +30,10 @@ public class ProductRestController {
     private ProductsService productsService;
     @Autowired
     private UserSession userSession;
+    @Autowired
+    private ImageService imageService;
 
+    private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
     @GetMapping("/products")
     public ResponseEntity<Collection<Product>> showAllProducts(@RequestParam(required = false) String search){
@@ -147,7 +158,70 @@ public class ProductRestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping("/products/{id}/image")
+    public ResponseEntity addImage(@RequestBody Image image, @PathVariable long id){
+        Path folder = IMAGES_FOLDER.resolve("products");
+        byte[] imageByte;
+        try {
+            Files.createDirectories(folder);
+            Path imagePath = folder.resolve(String.valueOf(id) + ".jpeg");
+            imageByte = Base64.getDecoder().decode(image.getImageBase64());
+            FileOutputStream fileOuputStream = new FileOutputStream(imagePath.toFile());
+            fileOuputStream.write(imageByte);
+            fileOuputStream.close();
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (Exception exception){
+            return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
+    @GetMapping("/products/{id}/image")
+    public ResponseEntity getImage(@PathVariable long id){
+        Image image;
+        Path folder = IMAGES_FOLDER.resolve("products");
+        try {
+            Files.createDirectories(folder);
+            Path imagePath = folder.resolve(String.valueOf(id) + ".jpeg");
+            byte[] fileArray = new byte[(int) imagePath.toFile().length()];
 
+            FileInputStream fileInputStream = new FileInputStream(imagePath.toFile());
+            fileInputStream.read(fileArray);
+            fileInputStream.close();
+            String imageByte = Base64.getEncoder().encodeToString(fileArray);
+            image = new Image();
+            image.setImageBase64(imageByte);
+            return new ResponseEntity<>(image, HttpStatus.OK);
+        }catch (Exception exception){
+            return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/products/{id}/image")
+    public ResponseEntity deleteImage(@PathVariable long id){
+        try{
+            imageService.deleteImage("products", id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (Exception exception){
+            return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/products/{id}/image")
+    public ResponseEntity editImage(@PathVariable long id, @RequestBody Image image){
+        Path folder = IMAGES_FOLDER.resolve("products");
+        byte[] imageByte;
+        try {
+            imageService.deleteImage("products", id);
+            Files.createDirectories(folder);
+            Path imagePath = folder.resolve(String.valueOf(id) + ".jpeg");
+            imageByte = Base64.getDecoder().decode(image.getImageBase64());
+            FileOutputStream fileOuputStream = new FileOutputStream(imagePath.toFile());
+            fileOuputStream.write(imageByte);
+            fileOuputStream.close();
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (Exception exception){
+            return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }
