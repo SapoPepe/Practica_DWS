@@ -1,0 +1,146 @@
+body{
+    background-image: url("logo.png");
+    background-repeat: repeat;
+    background-size: 14.3vw 14.3vw;
+
+}
+
+/********************** FORM *****************************/
+.title{
+    font-family: Arial;
+    text-align: center;
+    margin-top: 0;
+}
+
+.form-error{
+    color: red;
+    margin: 0;
+    font-family: Arial sans-serif;
+}
+
+.form-container {
+    width: 65vw;
+    background: linear-gradient(#212121, #212121) padding-box,
+    linear-gradient(145deg, transparent 35%, #1aff00, #00b8ff) border-box;
+    border: .2vw solid transparent;
+    padding: 2vw 2vw;
+    font-size: 1.2vw;
+    font-family: Arial sans-serif;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 2vw;
+    box-sizing: border-box;
+    border-radius: 1.6vw;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.form-container button:active {
+    scale: 0.95;
+}
+
+.form-container .form {
+    display: flex;
+    flex-direction: column;
+    gap: 2vw;
+}
+
+.form-container .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: .2vw;
+}
+
+.form-group input, .form-group label, .form-group label textarea{
+    font-size: 1.3vw;
+    font-family: Arial;
+}
+
+.form-text {
+    display: block;
+    margin-bottom: .1vw;
+    color: #717171;
+    font-weight: 600;
+    font-family: "Arial Black", serif;
+    font-size: 1.1vw;
+}
+
+.form-container .form-group input {
+    padding: .8vw 1vw;
+    border-radius: .8vw;
+    color: #fff;
+    background-color: transparent;
+    border: .1vw solid #414141;
+}
+
+.form-container .form-group textarea {
+    padding: 1vw 1.2vw;
+    border-radius: .8vw;
+    resize: none;
+    color: #fff;
+    width: 95.5%;
+    height: 9.6vw;
+    border: .1vw solid #414141;
+    background-color: transparent;
+}
+
+.form-container .form-group input::placeholder {
+    opacity: 0.5;
+}
+
+.form-container .form-group input:focus {
+    outline: none;
+    border-color: #1aff00;
+}
+
+.form-container .form-group textarea:focus {
+    outline: none;
+    border-color: #1aff00;
+}
+
+.form-container .form-buttons .form-submit-btn {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    align-self: flex-start;
+    font-family: inherit;
+    color: #717171;
+    font-weight: 600;
+    font-size: 1.3vw;
+    font-family: Arial;
+    width: 10%;
+    background: #464646;
+    border: .1vw solid #414141;
+    padding: .5vw 1.5vw;
+    gap: .8vw;
+    margin-top: .8vw;
+    cursor: pointer;
+    border-radius: .6vw;
+}
+
+#submit:hover{
+    background-color: #94ff81;
+    border-color: #94ff81;
+}
+
+#cancel{
+    width: 13%;
+}
+
+#cancel:hover{
+    background-color: #ff6666;
+    border-color: #ff6666;
+}
+
+#cancel a{
+    text-decoration: none;
+    color: #717171;
+}
+.form-buttons{
+    display: flex;
+    gap: 1vw;
+}
+
+
+/*******************************************************************/
