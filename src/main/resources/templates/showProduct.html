@@ -2,18 +2,126 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/showProduct-style.css" type="text/css">
+    <link rel="stylesheet" href="/topBar-style.css" type="text/css">
     <title>{{product.name}}</title>
 </head>
 
 <header class="header">
-    <a href="/">Home</a>
     <title>{{product.name}}</title>
 </header>
 
 <body>
+
+    <div class="top-bar">
+    <div class="logo-container">
+        <a href="/"><img src="/logo.png"></a>
+    </div>
+
+    <div class="searchBar">
+        <form action="/searchProduct" method="get">
+            <label for="search">
+                <input id="search" type="text" name="productName" required="" autocomplete="off" placeholder="Buscar producto">
+                <div class="searchIcon">
+                    <svg stroke-width="2" stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="swap-on">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linejoin="round" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+                <button type="reset" class="close-btn">
+                    <svg viewBox="0 0 20 20" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+                        <path clip-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" fill-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </label>
+        </form>
+    </div>
+    <div class="top-bar-buttons-container">
+        <form action="/newProduct" method="get" class="right-bar-button-content">
+            <button class="right-bar-button" id="new-product" type="submit">
+                <span>Crear producto</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path>            </svg>
+            </button>
+        </form>
+
+        <form action="/shoppingCart" method="get" class="right-bar-button-content">
+            <button class="right-bar-button" id="cart" type="submit">
+                <span>Carrito</span>
+                <svg class="top-bar-button-icon" viewBox="0 0 576 512"><path d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"></path></svg>
+            </button>
+        </form>
+    </div>
+</div>
+<hr>
+
+    <div class="product">
+        <div class="img-container"><img src="/product/{{id}}/image"></div>
+        <div class="product-info">
+            <div class="product-text">
+                <h2>{{product.name}}</h2>
+                <h3>{{product.price}} $</h3>
+                <p>Usuarios que lo añadieron a la cesta: <b>{{product.numProductsInCarts}}</b></p>
+                <hr>
+                <p class="product-description">{{product.description}}</p>
+            </div>
+
+            <div class="product-buttons">
+                <form method="post" action="/followProduct?id={{id}}">
+                    <button class="product-button" id="cart-button" type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="product-svg" viewBox="0 0 16 16"><path id="cart-path" d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M9 5.5V7h1.5a.5.5 0 0 1 0 1H9v1.5a.5.5 0 0 1-1 0V8H6.5a.5.5 0 0 1 0-1H8V5.5a.5.5 0 0 1 1 0"/></svg>
+                    </button>
+                </form>
+
+                <form action="/product/{{id}}/edit" method="post">
+                    <button class="product-button" id="edit-button" type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="product-svg" viewBox="0 0 16 16"> <path id="pen-path" d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/></svg>
+                    </button>
+                </form>
+
+                <form method="post" action="/product/{{id}}/delete">
+                    <button class="delete-button" type="submit">
+                        <svg viewBox="0 0 448 512" class="svgIcon"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="comments-container">
+        <h3>Comentarios</h3>
+        <div class="comment-form">
+            <form action="/product/{{id}}/newComment" method="post">
+                <p>Nombre de usuario: </p>
+                <input type="text" name="userName">
+                <p>Calificación: </p>
+                <input type="number" name="score" min="0" max="10" value="0">
+                <p>Comentario: </p>
+                <textarea name="opinion" cols="30" rows="10"></textarea>
+                <input type="submit" value="Comentar">
+            </form>
+        </div>
+
+        {{#commentList}}
+        <div class="comment">
+            <h5>{{userName}} - {{score}}</h5>
+            <p>{{opinion}}</p>
+            <form action="/product/{{id}}/comment/{{CID}}" method="post"><input type="submit" value="Borrar"></form>
+        </div>
+        {{/commentList}}
+        {{^commentList}}
+        <div class="comment">
+            <p>Se el primero en publicar un comentario</p>
+        </div>
+        {{/commentList}}
+    </div>
+
+
+
+
+
     <h2>{{product.name}}</h2><br>
     <h3>Precio: {{product.price}}</h3><br>
-    <img src="http://localhost:8080/product/{{id}}/image"  width="500px" height="500px" />
+    <img src="/product/{{id}}/image"  width="500px" height="500px" />
 
     <p>Usuarios que lo añadieron a la cesta: {{product.numProductsInCarts}}</p>
     <p>{{product.description}}</p><br>

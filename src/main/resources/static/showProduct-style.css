@@ -1,0 +1,208 @@
+.product{
+    display: flex;
+    width: 80%;
+    margin: 0 auto;
+    margin-top: 3vw;
+    padding: 2vw 2vw 2vw 2vw;
+    gap: 2vw;
+    border: .1vw solid grey;
+    border-radius: 2vw;
+    box-shadow: .5vw 1vw 2vw #111111;
+}
+
+.img-container{
+    height:auto;
+    width: 40%;
+    overflow: hidden;
+    border-radius: 2vw;
+}
+
+.img-container img{
+    height: 100%;
+    width: 100%;
+}
+
+.product-info{
+    width: 60%;
+}
+
+.product-text{
+    font-family: Arial;
+}
+
+.product-text h2{
+    font-size: 2.5vw;
+    margin-bottom: 1vw;
+    text-decoration: .1vw underline;
+}
+
+.product-text h3{
+    font-size: 2vw;
+    margin-top: 0;
+    margin-bottom: 1vw;
+}
+
+.product-text hr{
+    width: 100%;
+    justify-content: left;
+}
+
+.product-text p{
+    font-size: 1.2vw;
+}
+
+/************************ BUTTONS ****************************/
+.product-buttons{
+    display: flex;
+    gap: 1vw;
+}
+
+.delete-button {
+    width: 3vw;
+    height: 3vw;
+    border-radius: 50%;
+    background-color: #da5656;
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition-duration: .3s;
+    overflow: hidden;
+    position: relative;
+}
+
+.svgIcon {
+    width: 1vw;
+    transition-duration: .3s;
+}
+
+.svgIcon path {
+    fill: white;
+}
+
+.delete-button:hover {
+    width: 8vw;
+    border-radius: 2vw;
+    transition-duration: .3s;
+    background-color: rgb(255, 69, 69);
+    align-items: center;
+}
+
+.delete-button:hover .svgIcon {
+    width: 3vw;
+    transition-duration: .3s;
+    transform: translateY(60%);
+}
+
+.delete-button::before {
+    position: absolute;
+    top: -2.5vw;
+    content: "Delete";
+    color: white;
+    transition-duration: .3s;
+    font-size: .5vw;
+}
+
+.delete-button:hover::before {
+    font-size: 1vw;
+    opacity: 1;
+    transform: translateY(3vw);
+    transition-duration: .3s;
+}
+
+/*******************************************************/
+.product-button {
+    width: 3vw;
+    height: 3vw;
+    border-radius: 50%;
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition-duration: .3s;
+    overflow: hidden;
+    position: relative;
+}
+
+.product-svg {
+    width: 1.5vw;
+    transition-duration: .3s;
+}
+
+.product-button svg  path {
+    fill: white;
+}
+
+.product-button:hover {
+    width: 8vw;
+    border-radius: 2vw;
+    transition-duration: .3s;
+    align-items: center;
+}
+
+.product-button:hover .product-svg {
+    width: 1.5vw;
+    transition-duration: .3s;
+    transform: translateX(150%);
+}
+
+#cart-button::before {
+    position: absolute;
+    left: -4vw;
+    color: white;
+    transition-duration: .3s;
+    font-size: 1vw;
+    content: "Guardar";
+}
+
+#edit-button::before {
+    position: absolute;
+    left: -4vw;
+    color: white;
+    transition-duration: .3s;
+    font-size: 1vw;
+    content: "Editar";
+}
+
+.product-button:hover::before {
+    font-size: 1vw;
+    opacity: 1;
+    transform: translateX(125%);
+    transition-duration: .3s;
+}
+
+#cart-button{
+    background-color: #73b1c9;
+}
+
+#cart-button:hover{
+    background-color: rgb(0, 184, 255);
+}
+
+#edit-button{
+    background-color: #e5af6a;
+}
+
+#edit-button:hover{
+    background-color: rgb(255, 119, 10);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <link rel="stylesheet" href="/index-style.css" type="text/css">
+    <link rel="stylesheet" href="/topBar-style.css" type="text/css">
+
 </head>
 <body>
 
 <div class="top-bar">
     <div class="logo-container">
-        <img src="/logo.png">
+        <a href="/"><img src="/logo.png"></a>
     </div>
 
     <div class="searchBar">
@@ -78,7 +80,7 @@
     </div>
     {{/products}}
     {{^products}}
-        <p>No hay ningún producto</p>
+        <p class="noProducts">No hay ningún producto</p>
     {{/products}}
 </div>
 
