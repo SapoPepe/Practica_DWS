@@ -102,7 +102,7 @@ public class ProductRestController {
     //followProduct
     @GetMapping("/user/shoppingCart")
     public ResponseEntity showShoppingCart(){
-        Collection<Product> list = userSession.userProducts();
+        Collection<Product> list = productsService.availableProducts(userSession.userProducts());
         if(!list.isEmpty()){
             return new ResponseEntity<>(list, HttpStatus.OK);
         } else {
@@ -126,7 +126,7 @@ public class ProductRestController {
     public ResponseEntity deleteShoppingCart(@RequestParam long productId){
         //Long identification = Long.parseLong(id);
         if(productsService.getProduct(productId)!=null){
-            this.userSession.unfollow(productsService.getProduct(productId));
+            productsService.removeProductFromCart(productId, userSession);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
