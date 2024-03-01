@@ -62,7 +62,10 @@ public class ProductController {
 
                 model.addAttribute("name", name);
                 this.productsService.saveProduct(p);
-                imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
+                if(!image.isEmpty()){
+                    imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
+                    p.setPhoto(true);
+                }
                 return "saveProduct";
             } else{
                 model.addAttribute("noPrincipals", true);
@@ -79,7 +82,6 @@ public class ProductController {
 
     @GetMapping("/product/{id}/image")
     public ResponseEntity<Object> downloadImage(@PathVariable int id) throws MalformedURLException {
-
         return imageService.createResponseFromImage(PRODUCTS_FOLDER, id);
     }
 
@@ -99,9 +101,12 @@ public class ProductController {
     }
 
     @GetMapping("/product/{id}")
-    public String showProduct(Model model, @PathVariable Long id){
+    public String showProduct(Model model, @PathVariable Long id) throws MalformedURLException {
         Product prod1 = productsService.getProduct(id);
         model.addAttribute("product", prod1);
+        model.addAttribute("commentList", prod1.getComments());
+        if (this.imageService.imageExist(PRODUCTS_FOLDER, id)) model.addAttribute("containsPhoto", true);
+        else model.addAttribute("containsPhoto", false);
 
         return "showProduct";
     }
@@ -164,13 +169,14 @@ public class ProductController {
                              @RequestParam int score, @RequestParam String opinion){
         Product p = productsService.getProduct(id);
         if(p!=null){
-            p.addComment(new Comment(userName, score, opinion));
+            if(!userName.isEmpty() && score >= 0 && score <= 10) {
+                p.addComment(new Comment(userName, score, opinion));
+                model.addAttribute("error", false);
+            }
+            else model.addAttribute("error", true);
+
             model.addAttribute("product", p);
             model.addAttribute("commentList", p.getComments());
-            if(score<5) model.addAttribute("color", "bad");
-            else if(score<8) model.addAttribute("color", "average");
-            else model.addAttribute("color", "good");
-
         }
         return "showProduct";
     }

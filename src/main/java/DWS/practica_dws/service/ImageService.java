@@ -53,4 +53,11 @@ public class ImageService {
 			return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg").body(file);
 		}
 	}
+
+	public boolean imageExist(String folderName, long imageId) throws MalformedURLException {
+		Path folder = IMAGES_FOLDER.resolve(folderName);
+		Path imagePath = createFilePath(imageId, folder);
+		Resource file = new UrlResource(imagePath.toUri());
+        return Files.exists(imagePath);
+	}
 }

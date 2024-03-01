@@ -57,7 +57,12 @@
             <div class="product-interior">
                 <div class="product-img">
                     <a href="/product/{{id}}">
-                        <img src="/product/{{id}}/image" width="500px" height="500px" />
+                        {{#containsPhoto}}
+                        <img src="/product/{{id}}/image"/>
+                        {{/containsPhoto}}
+                        {{^containsPhoto}}
+                        <img src="/logo.png">
+                        {{/containsPhoto}}
                     </a>
                 </div>
                 <div class="product-text">

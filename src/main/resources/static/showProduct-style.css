@@ -267,6 +267,10 @@
     padding: 1vw 1vw;
 }
 
+.modal__body p{
+    color: red;
+}
+
 .modal__footer {
     padding: 0 1.5vw 1.5vw;
 }
@@ -348,17 +352,76 @@
     color: #8d8d8d;
 }
 
-.good {
-    color: green;
+/**************************************************************************/
+.essentials{
+    display: flex;
+    font-family: Arial;
+    font-size: 2vw;
+    align-items: center;
+    gap: 2vw;
 }
 
-.average {
-    color: yellow;
+.essentials-form-container{
+    display: flex;
+    align-items: center;
 }
 
-.bad {
-    color: red;
+/*************************************************************************/
+.bin-button {
+    width: 2.2vw;
+    height: 2.2vw;
+    border-radius: 50%;
+    background-color: rgb(20, 20, 20);
+    border: none;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px .2vw rgba(0, 0, 0, 0.164);
+    cursor: pointer;
+    transition-duration: 0.3s;
+    overflow: hidden;
+    position: relative;
+    gap: .1vw;
 }
+
+.bin-button .svgIcon {
+    width: .7vw;
+    transition-duration: 0.3s;
+}
+
+.bin-button .svgIcon path {
+    fill: white;
+}
+
+.bin-button:hover {
+    transition-duration: 0.3s;
+    background-color: rgb(255, 69, 69);
+    align-items: center;
+    gap: 0;
+}
+
+.bin-button .bin-top {
+    transform-origin: bottom right;
+}
+.bin-button:hover .bin-top {
+    transition-duration: 0.5s;
+    transform: rotate(160deg);
+}
+
+#clip0_35_24 rect{
+    fill: white;
+    height: 1vw;
+    width: 6.9vw;
+}
+
+#clip0_35_22 rect{
+    fill: white;
+    height: 5.7vw;
+    width: 6.9vw;
+}
+
 
 
 

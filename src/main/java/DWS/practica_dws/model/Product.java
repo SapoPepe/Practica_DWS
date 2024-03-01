@@ -13,6 +13,7 @@ public class Product {
     private String name;
     private List<Comment> comments;
     private List<User> inUsersShoppingCart;
+    public boolean containsPhoto;
 
 
     public Product(String name, String description, double price){
@@ -22,6 +23,7 @@ public class Product {
         this.numProductsInCarts = 0;
         this.comments = new ArrayList<>();
         this.inUsersShoppingCart = new ArrayList<>();
+        this.containsPhoto = false;
     }
 
     public void setID(Long l){
@@ -88,5 +90,9 @@ public class Product {
     public void addUsers(User u){
         this.inUsersShoppingCart.add(u);
         this.numProductsInCarts++;
+    }
+
+    public void setPhoto(boolean hasPhoto){
+        this.containsPhoto = hasPhoto;
     }
 }

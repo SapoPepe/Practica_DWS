@@ -15,9 +15,15 @@ public class ProductsService {
     public static long idNumber = 0;
     public ProductsService(){
         this.defaultProducts = new HashMap<>();
-        saveProduct(new Product("Producto1", "Descripción de producto 1", 30.23));
-        saveProduct(new Product("Producto2", "Descripción de producto 2", 12));
-        saveProduct(new Product("Producto3", "Descripción de producto 3", 823));
+        Product p1 = new Product("Producto1", "Descripción de producto 1", 30.23);
+        Product p2 = new Product("Producto2", "Descripción de producto 2", 12);
+        Product p3 = new Product("Producto3", "Descripción de producto 3", 823);
+        p1.setPhoto(true);
+        p2.setPhoto(true);
+        p3.setPhoto(true);
+        saveProduct(p1);
+        saveProduct(p2);
+        saveProduct(p3);
     }
 
     public void saveProduct(Product p){
