@@ -94,9 +94,10 @@ public class ProductRestController {
     public ResponseEntity showProduct(@PathVariable long id){
     if(productsService.getProduct(id)==null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    }else {
         Product product = productsService.getProduct(id);
         return new ResponseEntity<>(product, HttpStatus.OK);
+    }
     }
 
     //followProduct
