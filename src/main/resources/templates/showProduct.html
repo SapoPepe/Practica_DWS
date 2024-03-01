@@ -148,7 +148,8 @@
 
         {{#commentList}}
         <div class="comment">
-            <h5>{{userName}} - {{score}}</h5>
+            <h5>{{userName}}</h5>
+            <h5 class="{{color}}">{{score}}</h5>
             <p>{{opinion}}</p>
             <form action="/product/{{id}}/comment/{{CID}}" method="post"><input type="submit" value="Borrar"></form>
         </div>

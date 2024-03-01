@@ -15,7 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ProductController {
@@ -91,7 +94,7 @@ public class ProductController {
 
     @GetMapping("/shoppingCart")
     public String userProducts(Model m){
-        m.addAttribute("products", this.userSession.userProducts());
+        m.addAttribute("products", this.productsService.availableProducts(this.userSession.userProducts()));
         return "shoppingCart";
     }
 
@@ -151,7 +154,7 @@ public class ProductController {
     @PostMapping("/removeProductFromCart")
     public String removeProductFromCart(@RequestParam long id, Model model) {
         productsService.removeProductFromCart(id, userSession);
-        model.addAttribute("products", userSession.userProducts());
+        model.addAttribute("products", this.productsService.availableProducts(this.userSession.userProducts()));
         return "shoppingCart";
     }
 
@@ -164,6 +167,10 @@ public class ProductController {
             p.addComment(new Comment(userName, score, opinion));
             model.addAttribute("product", p);
             model.addAttribute("commentList", p.getComments());
+            if(score<5) model.addAttribute("color", "bad");
+            else if(score<8) model.addAttribute("color", "average");
+            else model.addAttribute("color", "good");
+
         }
         return "showProduct";
     }

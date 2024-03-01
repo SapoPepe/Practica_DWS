@@ -67,4 +67,12 @@ public class ProductsService {
         return matchingProducts; // Devuelve una lista de productos cuyo nombre contiene la cadena de búsqueda
     }
 
+    public Collection<Product> availableProducts(Collection<Product> cartProducts){
+        List<Product> aux = new ArrayList<>();
+        for (Product p : cartProducts){
+            if(this.defaultProducts.containsKey(p.getId())) aux.add(p);
+        }
+        return aux;
+    }
+
 }
