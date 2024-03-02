@@ -244,6 +244,7 @@
     align-items: center;
     justify-content: left;
     font-family: Arial;
+    margin-bottom: 4vw;
 }
 
 .modal {
@@ -353,17 +354,56 @@
 }
 
 /**************************************************************************/
+.comment{
+    border: .05vw solid grey;
+    border-radius: 1.2vw;
+    width: auto;
+    padding: 1vw 1vw 1vw 1vw;
+}
+
 .essentials{
     display: flex;
     font-family: Arial;
-    font-size: 2vw;
     align-items: center;
-    gap: 2vw;
+    gap: 1vw;
 }
 
 .essentials-form-container{
     display: flex;
     align-items: center;
+}
+
+.score-container{
+    width: 3.3vw;
+    height: 3.3vw;
+    border-radius: 1vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.score-container h5{
+    margin: 0;
+    font-size: 1.5vw;
+}
+
+.unserName-container h5{
+    margin: 0;
+    font-size: 1.2vw;
+}
+
+.text{
+    font-size: 1vw;
+    margin-left: .7vw;
+    margin-top: 1vw;
+    width: auto;
+    word-wrap: break-word;
+}
+
+.text p{
+    margin: 0;
+    width: auto;
 }
 
 /*************************************************************************/
