@@ -170,7 +170,9 @@ public class ProductController {
         Product p = productsService.getProduct(id);
         if(p!=null){
             if(!userName.isEmpty() && score >= 0 && score <= 10) {
-                p.addComment(new Comment(userName, score, opinion));
+                Comment comment = new Comment(userName, score, opinion);
+                p.addComment(comment);
+                userSession.getUser().addComment(comment);
                 model.addAttribute("error", false);
             }
             else model.addAttribute("error", true);
