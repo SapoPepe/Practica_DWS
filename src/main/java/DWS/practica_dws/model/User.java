@@ -27,4 +27,12 @@ public class User {
         return this.userProducts;
     }
 
+    public ArrayList<Comment> getComments() {
+        return comments;
+    }
+
+    public void addComment(Comment comment){
+        comments.add(comment);
+    }
+
 }

@@ -141,6 +141,7 @@ public class ProductRestController {
         if(productsService.getProduct(productId)!=null){
             Product product = productsService.getProduct(productId);
             product.addComment(comment);
+            userSession.getUser().addComment(comment);
             return new ResponseEntity<>(comment, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new CustomError("Algo ha salido mal. Revisa los datos."), HttpStatus.NOT_FOUND);
