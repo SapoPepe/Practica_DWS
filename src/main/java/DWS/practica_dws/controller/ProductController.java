@@ -53,16 +53,14 @@ public class ProductController {
         try{
             double priceD = Double.parseDouble(price);
             //If it doens't have the principal of the product
-            if(!name.isEmpty() && priceD>=0){
-                if(description!=null){
-                    p = new Product(name, "Producto sin descripción", priceD);
-                } else {
-                    p = new Product(name, description, priceD);
-                }
+            if(this.productsService.hasPrincipals(name, priceD)){
+
+                if(this.productsService.hasDescription(description)) p = new Product(name, "Producto sin descripción", priceD);
+                else p = new Product(name, description, priceD);
 
                 model.addAttribute("name", name);
                 this.productsService.saveProduct(p);
-                if(!image.isEmpty()){
+                if(this.productsService.hasImage(image)){
                     imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
                     p.setPhoto(true);
                 }
@@ -111,6 +109,7 @@ public class ProductController {
         return "showProduct";
     }
 
+
     @PostMapping("/product/{id}/delete")
     public String deleteProduct(Model model, @PathVariable long id) throws IOException {
         Product p = productsService.getProduct(id);
@@ -145,9 +144,7 @@ public class ProductController {
         model.addAttribute("product", p);
 
         try {
-            if (image != null && !image.isEmpty()) {
-                imageService.modifyImage("products", id, image, model);
-            }
+            if (this.productsService.hasImage(image)) imageService.modifyImage("products", id, image, model);
         } catch (IOException e) {
             // Handle exception
             e.printStackTrace();
@@ -165,12 +162,12 @@ public class ProductController {
 
 
     @PostMapping("/product/{id}/newComment")
-    public String newComment(Model model, @PathVariable long id, @RequestParam String userName,
-                             @RequestParam int score, @RequestParam String opinion){
+    public String newComment(Model model, @PathVariable long id, @RequestParam(required = false) String userName,
+                             @RequestParam(required = false) Integer score, @RequestParam(required = false) String opinion){
         Product p = productsService.getProduct(id);
         if(p!=null){
-            if(!userName.isEmpty() && score >= 0 && score <= 10) {
-                Comment comment = new Comment(userName, score, opinion);
+            if(this.productsService.correctComment(userName, score)) {
+                Comment comment = new Comment(userName, score.intValue(), opinion);
                 p.addComment(comment);
                 userSession.getUser().addComment(comment);
                 model.addAttribute("error", false);

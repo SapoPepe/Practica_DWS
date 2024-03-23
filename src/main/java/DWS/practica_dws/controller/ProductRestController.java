@@ -52,16 +52,15 @@ public class ProductRestController {
 
     @PostMapping("/products")
     public ResponseEntity addProduct(@RequestBody Product product){
-        if(product.getName()!=null && product.getPrice()>0){        //0 isn´t considered a valid price
-            if(product.getDescription()==null){
-                product.setDescription("Producto sin descripción");
-            }
+        if(this.productsService.hasPrincipals(product.getName(), product.getPrice())){
+
+            if(this.productsService.hasDescription(product.getDescription())) product.setDescription("Producto sin descripción");
+
             this.productsService.saveProduct(product);
-            //imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
             return new ResponseEntity<>(product, HttpStatus.OK);
-        } else{
-            return new ResponseEntity<>(new CustomError("No name or price"), HttpStatus.BAD_REQUEST);
         }
+
+        else return new ResponseEntity<>(new CustomError("No name or price"), HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/products/{id}")
@@ -137,14 +136,15 @@ public class ProductRestController {
 
     @PostMapping("/products/{productId}/comments")
     public ResponseEntity addComment(@PathVariable long productId, @RequestBody Comment comment){
-        //Long identification = Long.parseLong(id);
-        if(productsService.getProduct(productId)!=null){
-            Product product = productsService.getProduct(productId);
+        Product product = this.productsService.getProduct(productId);
+
+        //If the product exist and the comment is well-formed, it's add to the product
+        if(product!=null && this.productsService.correctComment(comment.getUserName(), comment.getScore())){
             product.addComment(comment);
             userSession.getUser().addComment(comment);
             return new ResponseEntity<>(comment, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new CustomError("Algo ha salido mal. Revisa los datos."), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new CustomError("Algo ha salido mal. Revisa los datos."), HttpStatus.BAD_REQUEST);
         }
     }
     //Faltan comprobaciones

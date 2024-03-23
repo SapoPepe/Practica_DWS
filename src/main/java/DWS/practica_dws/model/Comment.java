@@ -6,7 +6,7 @@ public class Comment {
     private int score;
     private String opinion;
 
-    public Comment(String userName, int score, String opinion) {
+    public Comment(String userName, Integer score, String opinion) {
         this.userName = userName;
         this.score = score;
         this.opinion = opinion;

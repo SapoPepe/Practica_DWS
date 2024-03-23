@@ -3,6 +3,8 @@ package DWS.practica_dws.service;
 import DWS.practica_dws.model.Product;
 import DWS.practica_dws.model.User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -64,14 +66,6 @@ public class ProductsService {
         userSession.unfollow(productToRemove);
     }
 
-    public boolean contains(Long id){
-        return this.defaultProducts.get(id)!=null;
-    }
-
-    public String getProductName(Long id){
-        return this.defaultProducts.get(id).getName();
-    }
-
     public List<Product> getProductsByName(String productName) {
         List<Product> matchingProducts = new ArrayList<>();
         for (Product product : this.defaultProducts.values()) {
@@ -90,4 +84,19 @@ public class ProductsService {
         return aux;
     }
 
+    public boolean hasPrincipals(String name, double price){
+        return name!=null && price>0;
+    }
+
+    public boolean hasDescription(String description){
+        return description!=null;
+    }
+
+    public boolean hasImage(MultipartFile image){
+        return image!=null && !image.isEmpty();
+    }
+
+    public boolean correctComment(String name, Integer score){
+        return name!=null && !name.isEmpty() && score!=null && !score.describeConstable().isEmpty() && score.intValue()>=0 && score.intValue()<=10;
+    }
 }
