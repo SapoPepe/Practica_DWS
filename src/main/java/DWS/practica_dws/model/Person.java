@@ -1,9 +1,14 @@
 package DWS.practica_dws.model;
 
-import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 //@Table(name = "users") //Changes the name of the table to "users" due to an error in SQL if the table names "user"
@@ -15,7 +20,7 @@ public class Person {
     private String personName;
     //private ArrayList<Comment> comments = new ArrayList<>();
     @ManyToMany
-    private ArrayList<Product> userProducts = new ArrayList<>();
+    private List<Product> userProducts = new ArrayList<>();
 
     public Person() {
     }
