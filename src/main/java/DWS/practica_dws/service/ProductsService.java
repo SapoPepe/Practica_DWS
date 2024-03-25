@@ -1,22 +1,28 @@
 package DWS.practica_dws.service;
 
+import DWS.practica_dws.model.Comment;
+import DWS.practica_dws.model.Person;
 import DWS.practica_dws.model.Product;
-import DWS.practica_dws.model.User;
+import DWS.practica_dws.repository.CommentRepository;
+import DWS.practica_dws.repository.ProductRepository;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
 @Service
 public class ProductsService {
-    //Each product have a diferent ID
-    private Map<Long, Product> defaultProducts;
-    //private AtomicLong nextId = new AtomicLong();
 
-    public static long idNumber = 0;
-    public ProductsService(){
-        this.defaultProducts = new HashMap<>();
+    @Autowired
+    private ProductRepository products;
+    @Autowired
+    private CommentRepository comments;
+
+
+    @PostConstruct
+    public void init(){
         Product p1 = new Product("Acetie homeopático", "Para cuando la vida te da limones, ¡tú le das CBD!  Un toque de tranquilidad para esos días estresantes. Relájate, respira profundo y disfruta de la vibra natural. ¡Dile adiós al estrés y hola a la buena energía!", 18.90);
         Product p2 = new Product("Botellín de cerveza", "¿Cansado de la misma rutina? ¡Relájate con la nueva Cerveza CBD! Suave, refrescante y con un toque especial que te hará sentir zen. Olvídate del estrés y disfruta de una experiencia única. ¡Salud!", 2.15);
         Product p3 = new Product("Crema de manos", "¿Manos secas y estresadas? ¡Dile adiós a la piel áspera con nuestra crema de manos con CBD! Enriquecida con aceite de cáñamo, esta crema mágica te dará la hidratación que necesitas para unas manos suaves como la seda. Además, su efecto relajante te ayudará a desestresarte después de un largo día. ¡Olvídate de las preocupaciones y disfruta de unas manos sanas y felices!", 24.1);
@@ -29,67 +35,69 @@ public class ProductsService {
         p4.setPhoto(true);
         p5.setPhoto(true);
         p6.setPhoto(true);
-        saveProduct(p1);
-        saveProduct(p2);
-        saveProduct(p3);
-        saveProduct(p4);
-        saveProduct(p5);
-        saveProduct(p6);
+        this.products.save(p1);
+        this.products.save(p2);
+        this.products.save(p3);
+        this.products.save(p4);
+        this.products.save(p5);
+        this.products.save(p6);
+
     }
 
     public void saveProduct(Product p){
-        //long id = nextId.getAndIncrement();
-        p.setID(idNumber);
-        this.defaultProducts.put(idNumber, p);
-        idNumber++;
+        this.products.save(p);
     }
 
     public Collection<Product> getAll(){
-        return this.defaultProducts.values();
+        return this.products.findAll();
     }
 
-    public Product getProduct(Long id){
-        return this.defaultProducts.get(id);
+    public Optional<Product> getProduct(Long id){
+        return this.products.findById(id);
     }
 
     public Product deleteProduct(long id){
-        if(this.defaultProducts.containsKey(id)){
-            Product product= this.getProduct(id);
-            this.defaultProducts.remove(id);
-            return product;
+        Optional<Product> aux = this.products.findById(id);
+        //If aux contains something we remove it from the DB
+        if(aux.isPresent()){
+            Product p = aux.get();
+            this.products.delete(p);
+            return p;
         }
         return null;
     }
 
-    public void removeProductFromCart(long id, UserSession userSession) {
+    public void saveComment(Comment c){
+        this.comments.save(c);
+    }
+
+    public void deleteComment(long CID){
+        this.comments.deleteById(CID);
+    }
+/*
+    public void removeProductFromCart(long id, PersonSession userSession) {
         Product productToRemove = this.getProduct(id);
         userSession.unfollow(productToRemove);
-    }
+    }*/
 
     public List<Product> getProductsByName(String productName) {
-        List<Product> matchingProducts = new ArrayList<>();
-        for (Product product : this.defaultProducts.values()) {
-            if (product.getName().toLowerCase().contains(productName.toLowerCase())) {
-                matchingProducts.add(product);
-            }
-        }
-        return matchingProducts; // Devuelve una lista de productos cuyo nombre contiene la cadena de búsqueda
+        return this.products.findProductByName(productName);
     }
-
+/*
     public Collection<Product> availableProducts(Collection<Product> cartProducts){
         List<Product> aux = new ArrayList<>();
         for (Product p : cartProducts){
             if(this.defaultProducts.containsKey(p.getId())) aux.add(p);
         }
         return aux;
-    }
+    }*/
 
     public boolean hasPrincipals(String name, double price){
         return name!=null && price>0;
     }
 
     public boolean hasDescription(String description){
-        return description!=null;
+        return description!=null && !description.isEmpty();
     }
 
     public boolean hasImage(MultipartFile image){

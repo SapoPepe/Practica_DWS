@@ -1,35 +1,12 @@
 package DWS.practica_dws.controller;
 
-import DWS.practica_dws.model.Comment;
-import DWS.practica_dws.model.CustomError;
-import DWS.practica_dws.model.Image;
-import DWS.practica_dws.model.Product;
-import DWS.practica_dws.service.ImageService;
-import DWS.practica_dws.service.ProductsService;
-import DWS.practica_dws.service.UserSession;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.Collection;
-
-@RestController
+/*@RestController
 @RequestMapping("/api")
 public class ProductRestController {
     @Autowired
     private ProductsService productsService;
     @Autowired
-    private UserSession userSession;
+    private PersonSession userSession;
     @Autowired
     private ImageService imageService;
 
@@ -227,3 +204,4 @@ public class ProductRestController {
     }
 
 }
+*/

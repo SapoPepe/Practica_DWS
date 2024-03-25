@@ -1,10 +1,19 @@
 package DWS.practica_dws.model;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Comment {
-    private int CID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long CID;
+
     private String userName;
     private int score;
     private String opinion;
+
+    public Comment() {
+    }
 
     public Comment(String userName, Integer score, String opinion) {
         this.userName = userName;
@@ -12,17 +21,6 @@ public class Comment {
         this.opinion = opinion;
     }
 
-    public void setID(int CID){
-        this.CID = CID;
-    }
-
-    public int getCID() {
-        return CID;
-    }
-
-    public void setCID(int CID) {
-        this.CID = CID;
-    }
 
     public String getUserName() {
         return userName;

@@ -1,18 +1,35 @@
 package DWS.practica_dws.model;
 
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class User {
-    private String name = "Pepe";
-    private ArrayList<Comment> comments = new ArrayList<>();
+@Entity
+//@Table(name = "users") //Changes the name of the table to "users" due to an error in SQL if the table names "user"
+public class Person {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    private String personName;
+    //private ArrayList<Comment> comments = new ArrayList<>();
+    @ManyToMany
     private ArrayList<Product> userProducts = new ArrayList<>();
 
+    public Person() {
+    }
+
+    public Person(String name){
+        this.personName = name;
+    }
+
+
     public String getName() {
-        return name;
+        return personName;
     }
     public void setName(String name) {
-        this.name = name;
+        this.personName = name;
     }
 
     public void followProduct(Product p){
@@ -26,7 +43,7 @@ public class User {
     public Collection<Product> cartProducts(){
         return this.userProducts;
     }
-
+/*
     public ArrayList<Comment> getComments() {
         return comments;
     }
@@ -35,4 +52,13 @@ public class User {
         comments.add(comment);
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+ */
 }

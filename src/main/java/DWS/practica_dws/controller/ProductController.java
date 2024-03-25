@@ -4,7 +4,7 @@ import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.Product;
 import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.ProductsService;
-import DWS.practica_dws.service.UserSession;
+import DWS.practica_dws.service.PersonSession;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class ProductController {
     @Autowired
-    private UserSession userSession;
+    private PersonSession personSession;
     @Autowired
     private ProductsService productsService;
 
@@ -32,7 +29,7 @@ public class ProductController {
 
     @GetMapping("/")
     public String showProducts(Model model, HttpSession httpSession){
-        if(httpSession.isNew()) this.userSession = new UserSession(httpSession);
+        //if(httpSession.isNew()) this.userSession = new PersonSession();
         model.addAttribute("products", this.productsService.getAll());
         return "index";
     }
@@ -45,7 +42,7 @@ public class ProductController {
 
 
     @PostMapping("/product/new")
-    public String newProduct(Model model, @RequestParam String name, @RequestParam String description,
+    public String newProduct(Model model, @RequestParam String name, @RequestParam (required = false) String description,
                              @RequestParam(required = false) String price, @RequestParam MultipartFile image) {
 
         Product p;
@@ -55,7 +52,7 @@ public class ProductController {
             //If it doens't have the principal of the product
             if(this.productsService.hasPrincipals(name, priceD)){
 
-                if(this.productsService.hasDescription(description)) p = new Product(name, "Producto sin descripción", priceD);
+                if(!this.productsService.hasDescription(description)) p = new Product(name, "Producto sin descripción", priceD);
                 else p = new Product(name, description, priceD);
 
                 model.addAttribute("name", name);
@@ -86,23 +83,27 @@ public class ProductController {
     @PostMapping("/followProduct")
     public String follow(Model m, @RequestParam String id){
         Long identification = Long.parseLong(id);
-        this.userSession.follow(this.productsService.getProduct(identification));
-        m.addAttribute("name", this.productsService.getProduct(identification).getName());
+        this.personSession.follow(this.productsService.getProduct(identification));
+
+        this.productsService.getProduct(identification).ifPresent(product -> {
+            m.addAttribute("name", product.getName());
+        });
         return "followProduct";
     }
 
-
+/*
     @GetMapping("/shoppingCart")
     public String userProducts(Model m){
         m.addAttribute("products", this.productsService.availableProducts(this.userSession.userProducts()));
         return "shoppingCart";
-    }
+    }*/
 
     @GetMapping("/product/{id}")
     public String showProduct(Model model, @PathVariable Long id) throws MalformedURLException {
-        Product prod1 = productsService.getProduct(id);
-        model.addAttribute("product", prod1);
-        model.addAttribute("commentList", prod1.getComments());
+        Optional<Product> p = productsService.getProduct(id);
+        Product product = p.get();
+        model.addAttribute("product", product);
+        model.addAttribute("commentList", product.getComments());
         if (this.imageService.imageExist(PRODUCTS_FOLDER, id)) model.addAttribute("containsPhoto", true);
         else model.addAttribute("containsPhoto", false);
 
@@ -112,10 +113,12 @@ public class ProductController {
 
     @PostMapping("/product/{id}/delete")
     public String deleteProduct(Model model, @PathVariable long id) throws IOException {
-        Product p = productsService.getProduct(id);
+        Optional<Product> aux = this.productsService.getProduct(id);
 
-        if(p!=null){
-            productsService.deleteProduct(id);
+        //If aux contains something we delete that product
+        if(aux.isPresent()){
+            Product p = aux.get();
+            this.productsService.deleteProduct(id);
             try {
                 imageService.deleteImage(PRODUCTS_FOLDER, p.getId());
             } catch (IOException e) {
@@ -128,9 +131,11 @@ public class ProductController {
         return "deletedProduct";
     }
 
+
     @PostMapping("/product/{id}/edit")
     public String showEditForm(Model model, @PathVariable long id) {
-        Product p = productsService.getProduct(id);
+        Optional<Product> aux = this.productsService.getProduct(id);
+        Product p = aux.get();
         model.addAttribute("product", p);
         return "editProduct";
     }
@@ -139,12 +144,14 @@ public class ProductController {
     public String editProduct(Model model, @PathVariable long id, @RequestParam(required = false) String name,
                               @RequestParam(required = false) double price, @RequestParam(required = false) String description,
                               @RequestParam(required = false) MultipartFile image) {
-        Product p = productsService.getProduct(id);
+        Optional<Product> aux = this.productsService.getProduct(id);
+        Product p = aux.get();
         p.updateInfo(name, description, price);
+        this.productsService.saveProduct(p);
         model.addAttribute("product", p);
 
         try {
-            if (this.productsService.hasImage(image)) imageService.modifyImage("products", id, image, model);
+            if (this.productsService.hasImage(image)) this.imageService.modifyImage("products", id, image, model);
         } catch (IOException e) {
             // Handle exception
             e.printStackTrace();
@@ -152,24 +159,26 @@ public class ProductController {
 
         return "showProduct";
     }
-
+/*
     @PostMapping("/removeProductFromCart")
     public String removeProductFromCart(@RequestParam long id, Model model) {
         productsService.removeProductFromCart(id, userSession);
         model.addAttribute("products", this.productsService.availableProducts(this.userSession.userProducts()));
         return "shoppingCart";
     }
-
+*/
 
     @PostMapping("/product/{id}/newComment")
     public String newComment(Model model, @PathVariable long id, @RequestParam(required = false) String userName,
                              @RequestParam(required = false) Integer score, @RequestParam(required = false) String opinion){
-        Product p = productsService.getProduct(id);
-        if(p!=null){
+        Optional<Product> aux = productsService.getProduct(id);
+        if(aux.isPresent()){
+            Product p = aux.get();
             if(this.productsService.correctComment(userName, score)) {
                 Comment comment = new Comment(userName, score.intValue(), opinion);
                 p.addComment(comment);
-                userSession.getUser().addComment(comment);
+                this.productsService.saveProduct(p);
+                //userSession.getUser().addComment(comment);
                 model.addAttribute("error", false);
             }
             else model.addAttribute("error", true);
@@ -181,11 +190,13 @@ public class ProductController {
     }
 
     @PostMapping("/product/{id}/comment/{CID}")
-    public String deleteComment(Model model, @PathVariable long id, @PathVariable int CID) {
-        Product p = productsService.getProduct(id);
+    public String deleteComment(Model model, @PathVariable long id, @PathVariable long CID) {
+        Optional<Product> aux = this.productsService.getProduct(id);
 
-        if(p!=null){
+        if(aux.isPresent()){
+            Product p = aux.get();
             p.removeComment(CID);
+            this.productsService.deleteComment(CID);
             model.addAttribute("product", p);
             model.addAttribute("commentList", p.getComments());
         }
@@ -195,7 +206,7 @@ public class ProductController {
 
     @GetMapping("/searchProduct")
     public String searchProduct(Model model, @RequestParam String productName) {
-        List<Product> matchingProducts = productsService.getProductsByName(productName);
+        List<Product> matchingProducts = this.productsService.getProductsByName(productName);
         model.addAttribute("products", matchingProducts);
         return "searchResults";
     }

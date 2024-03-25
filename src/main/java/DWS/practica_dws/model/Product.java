@@ -1,20 +1,32 @@
 package DWS.practica_dws.model;
 
-import DWS.practica_dws.service.UserSession;
+import jakarta.persistence.*;
 
 import java.util.*;
 
+@Entity
 public class Product {
     //Each product have an ID
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+
     private int numProductsInCarts;
     private double price;
-    private String description;
     private String name;
+    @Lob
+    private String description;
+    //If the Product is being deleted, all their comments are deleted too
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> comments;
-    private List<User> inUsersShoppingCart;
+    @ManyToMany
+    private List<Person> inUsersShoppingCart;
     public boolean containsPhoto;
 
+
+    public Product() {
+    }
 
     public Product(String name, String description, double price){
         this.name = name;
@@ -52,22 +64,22 @@ public class Product {
     }
 
     public void addComment(Comment c){
-        c.setID(this.comments.size());
         this.comments.add(c);
-    }
-
-    public void removeComment(int CID){
-        this.comments.remove(CID);
     }
 
     public Collection<Comment> getComments(){
         return this.comments;
     }
 
+    public void removeComment(long CID){
+        this.comments.remove((int) (CID-1));
+    }
+
+/*
     public List<User> getInUsersShoppingCart() {
         return inUsersShoppingCart;
     }
-
+*/
     public void updateInfo(String name, String description, double price){
         if(name!=null){
             this.name = name;
@@ -82,12 +94,13 @@ public class Product {
         }
      }
 
+     /*
     public void removeUsers(User u){
         this.inUsersShoppingCart.remove(u);
         this.numProductsInCarts--;
     }
-
-    public void addUsers(User u){
+*/
+    public void addUsers(Person u){
         this.inUsersShoppingCart.add(u);
         this.numProductsInCarts++;
     }
