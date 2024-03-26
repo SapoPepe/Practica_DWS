@@ -80,23 +80,6 @@ public class ProductController {
         return imageService.createResponseFromImage(PRODUCTS_FOLDER, id);
     }
 
-    @PostMapping("/followProduct")
-    public String follow(Model m, @RequestParam String id){
-        Long identification = Long.parseLong(id);
-        this.personSession.follow(this.productsService.getProduct(identification));
-
-        this.productsService.getProduct(identification).ifPresent(product -> {
-            m.addAttribute("name", product.getName());
-        });
-        return "followProduct";
-    }
-
-/*
-    @GetMapping("/shoppingCart")
-    public String userProducts(Model m){
-        m.addAttribute("products", this.productsService.availableProducts(this.userSession.userProducts()));
-        return "shoppingCart";
-    }*/
 
     @GetMapping("/product/{id}")
     public String showProduct(Model model, @PathVariable Long id) throws MalformedURLException {
@@ -159,14 +142,32 @@ public class ProductController {
 
         return "showProduct";
     }
-/*
+
+    @PostMapping("/followProduct")
+    public String follow(Model m, @RequestParam String id){
+        long identification = Long.parseLong(id);
+        this.personSession.follow(identification);
+        this.productsService.getProduct(identification).ifPresent(product -> {
+            m.addAttribute("name", product.getName());
+        });
+        return "followProduct";
+    }
+
     @PostMapping("/removeProductFromCart")
-    public String removeProductFromCart(@RequestParam long id, Model model) {
-        productsService.removeProductFromCart(id, userSession);
-        model.addAttribute("products", this.productsService.availableProducts(this.userSession.userProducts()));
+    public String removeProductFromCart(Model model, @RequestParam String id) {
+        long identification = Long.parseLong(id);
+        this.personSession.unfollow(identification);
+        model.addAttribute("products", this.productsService.availableProducts(this.personSession.personProducts()));
         return "shoppingCart";
     }
-*/
+
+
+    @GetMapping("/shoppingCart")
+    public String userProducts(Model m){
+        m.addAttribute("products", this.productsService.availableProducts(this.personSession.personProducts()));
+        return "shoppingCart";
+    }
+
 
     @PostMapping("/product/{id}/newComment")
     public String newComment(Model model, @PathVariable long id, @RequestParam(required = false) String userName,
@@ -178,7 +179,7 @@ public class ProductController {
                 Comment comment = new Comment(userName, score.intValue(), opinion);
                 p.addComment(comment);
                 this.productsService.saveProduct(p);
-                //userSession.getUser().addComment(comment);
+                this.personSession.addComment(comment);
                 model.addAttribute("error", false);
             }
             else model.addAttribute("error", true);
@@ -196,6 +197,7 @@ public class ProductController {
         if(aux.isPresent()){
             Product p = aux.get();
             p.removeComment(CID);
+            this.personSession.deleteComment(CID);
             this.productsService.deleteComment(CID);
             model.addAttribute("product", p);
             model.addAttribute("commentList", p.getComments());

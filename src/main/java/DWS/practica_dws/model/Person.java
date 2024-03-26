@@ -1,14 +1,12 @@
 package DWS.practica_dws.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 
 @Entity
 //@Table(name = "users") //Changes the name of the table to "users" due to an error in SQL if the table names "user"
@@ -18,7 +16,8 @@ public class Person {
     private Long id;
 
     private String personName;
-    //private ArrayList<Comment> comments = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
     @ManyToMany
     private List<Product> userProducts = new ArrayList<>();
 
@@ -48,8 +47,8 @@ public class Person {
     public Collection<Product> cartProducts(){
         return this.userProducts;
     }
-/*
-    public ArrayList<Comment> getComments() {
+
+    public List<Comment> getComments() {
         return comments;
     }
 
@@ -57,13 +56,10 @@ public class Person {
         comments.add(comment);
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void deleteComment(Comment c){
+        this.comments.remove(c);
     }
-
-    public Long getId() {
+    public Long getID() {
         return id;
     }
-
- */
 }

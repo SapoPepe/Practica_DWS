@@ -19,6 +19,8 @@ public class ProductsService {
     private ProductRepository products;
     @Autowired
     private CommentRepository comments;
+    @Autowired
+    private PersonSession personSession;
 
 
     @PostConstruct
@@ -61,6 +63,7 @@ public class ProductsService {
         //If aux contains something we remove it from the DB
         if(aux.isPresent()){
             Product p = aux.get();
+            this.personSession.deleteProductFromCarts(p);
             this.products.delete(p);
             return p;
         }
@@ -76,21 +79,21 @@ public class ProductsService {
     }
 /*
     public void removeProductFromCart(long id, PersonSession userSession) {
-        Product productToRemove = this.getProduct(id);
+        Optional<Product> productToRemove = this.products.findById(id);
         userSession.unfollow(productToRemove);
-    }*/
-
+    }
+*/
     public List<Product> getProductsByName(String productName) {
         return this.products.findProductByName(productName);
     }
-/*
+
     public Collection<Product> availableProducts(Collection<Product> cartProducts){
         List<Product> aux = new ArrayList<>();
         for (Product p : cartProducts){
-            if(this.defaultProducts.containsKey(p.getId())) aux.add(p);
+            if(this.products.findById(p.getId()).isPresent()) aux.add(p);
         }
         return aux;
-    }*/
+    }
 
     public boolean hasPrincipals(String name, double price){
         return name!=null && price>0;

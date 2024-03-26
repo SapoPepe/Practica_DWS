@@ -94,12 +94,12 @@ public class Product {
         }
      }
 
-     /*
-    public void removeUsers(User u){
+
+    public void removePerson(Person u){
         this.inUsersShoppingCart.remove(u);
         this.numProductsInCarts--;
     }
-*/
+
     public void addUsers(Person u){
         this.inUsersShoppingCart.add(u);
         this.numProductsInCarts++;
