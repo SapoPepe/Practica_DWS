@@ -196,7 +196,7 @@ public class ProductController {
 
         if(aux.isPresent()){
             Product p = aux.get();
-            p.removeComment(CID);
+            this.productsService.deleteCommentFromProduct(CID, id);
             this.personSession.deleteComment(CID);
             this.productsService.deleteComment(CID);
             model.addAttribute("product", p);

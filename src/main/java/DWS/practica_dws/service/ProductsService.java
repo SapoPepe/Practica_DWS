@@ -81,6 +81,12 @@ public class ProductsService {
         this.comments.deleteById(CID);
     }
 
+    public void deleteCommentFromProduct(long CID, long id){
+        Product p = this.products.findById(id).orElseThrow();
+        Comment c = this.comments.findById(CID).orElseThrow();
+        p.removeComment(c);
+    }
+
     public Comment getComment(long CID){
         return this.comments.findById(CID).orElseThrow();
     }

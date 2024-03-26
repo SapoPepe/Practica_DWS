@@ -71,8 +71,8 @@ public class Product {
         return this.comments;
     }
 
-    public void removeComment(long CID){
-        this.comments.remove((int) (CID-1));
+    public void removeComment(Comment c){
+        this.comments.remove(c);
     }
 
 /*
