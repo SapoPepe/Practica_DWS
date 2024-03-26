@@ -67,7 +67,7 @@ public class Product {
         this.comments.add(c);
     }
 
-    public Collection<Comment> getComments(){
+    public List<Comment> getComments(){
         return this.comments;
     }
 

@@ -101,7 +101,7 @@ public class ProductController {
         //If aux contains something we delete that product
         if(aux.isPresent()){
             Product p = aux.get();
-            this.productsService.deleteProduct(id);
+            this.productsService.deleteProduct(id, this.personSession);
             try {
                 imageService.deleteImage(PRODUCTS_FOLDER, p.getId());
             } catch (IOException e) {

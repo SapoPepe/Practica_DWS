@@ -22,9 +22,7 @@ public class PersonSession {
     @Autowired
     private PersonRepository persons;
     @Autowired
-    private ProductRepository products;
-    @Autowired
-    private CommentRepository comments;
+    private ProductsService productsService;
 
     @PostConstruct
     public void init(){
@@ -34,7 +32,7 @@ public class PersonSession {
 
 
     public void follow(Long identification){
-        Optional<Product> o = this.products.findById(identification);
+        Optional<Product> o = this.productsService.getProduct(identification);
         Person per = this.persons.findById(Long.valueOf(1)).orElseThrow();
 
 
@@ -43,19 +41,19 @@ public class PersonSession {
             per.followProduct(p);
             this.persons.save(per);
             p.addUsers(per);
-            this.products.save(p);
+            this.productsService.saveProduct(p);
         }
     }
 
 
     public void unfollow(Long id){
-        Optional<Product> o = this.products.findById(id);
+        Optional<Product> o = this.productsService.getProduct(id);
         Person per = this.persons.findById(Long.valueOf(1)).orElseThrow();
 
         if(o.isPresent()){
             Product p = o.get();
             p.removePerson(per);
-            this.products.save(p);
+            this.productsService.saveProduct(p);
 
             per.unfollowProduct(p);
             this.persons.save(per);
@@ -86,13 +84,24 @@ public class PersonSession {
         Person per = this.persons.findById(Long.valueOf(1)).orElseThrow();
         per.addComment(c);
         this.persons.save(per);
+        this.productsService.saveComment(c);
     }
 
     public void deleteComment(Long CID){
         Person per = this.persons.findById(Long.valueOf(1)).orElseThrow();
-        Comment c = this.comments.findById(CID).orElseThrow();
+        Comment c = this.productsService.getComment(CID);
         per.deleteComment(c);
         this.persons.save(per);
-        this.comments.delete(c);
+        this.productsService.deleteComment(CID);
+    }
+
+    public void deleteCommentsFromUsers(List<Comment> comments){
+        List<Person> aux = this.persons.findAll();
+        for(Person per : aux){
+            for (Comment c : comments){
+                per.deleteComment(c);
+                this.persons.save(per);
+            }
+        }
     }
 }

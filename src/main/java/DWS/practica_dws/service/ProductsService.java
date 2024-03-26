@@ -19,8 +19,9 @@ public class ProductsService {
     private ProductRepository products;
     @Autowired
     private CommentRepository comments;
-    @Autowired
-    private PersonSession personSession;
+    //It has to be desactivated due to a ciclic iteration between ProductService and PersonSession
+    /*@Autowired
+    private PersonSession personSession;*/
 
 
     @PostConstruct
@@ -58,12 +59,14 @@ public class ProductsService {
         return this.products.findById(id);
     }
 
-    public Product deleteProduct(long id){
+    public Product deleteProduct(long id, PersonSession session){
         Optional<Product> aux = this.products.findById(id);
         //If aux contains something we remove it from the DB
         if(aux.isPresent()){
             Product p = aux.get();
-            this.personSession.deleteProductFromCarts(p);
+            session.deleteProductFromCarts(p);
+            //We need to delete the comments form this product in middle table that associate users with comments because if not it jump off an error
+            session.deleteCommentsFromUsers(p.getComments());
             this.products.delete(p);
             return p;
         }
@@ -77,6 +80,11 @@ public class ProductsService {
     public void deleteComment(long CID){
         this.comments.deleteById(CID);
     }
+
+    public Comment getComment(long CID){
+        return this.comments.findById(CID).orElseThrow();
+    }
+
 /*
     public void removeProductFromCart(long id, PersonSession userSession) {
         Optional<Product> productToRemove = this.products.findById(id);
