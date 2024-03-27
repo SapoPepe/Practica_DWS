@@ -84,6 +84,10 @@ public class Product {
         this.comments.remove(c);
     }
 
+    public void removeAllComments(){
+        this.comments.clear();
+    }
+
     public Blob getImageFile(){
         return this.image;
     }

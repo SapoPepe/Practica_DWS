@@ -127,8 +127,10 @@ public class ProductController {
         //If aux contains something we delete that product
         if(aux.isPresent()){
             Product p = aux.get();
+            //We first delete the image from the DB and then the product entity
             p.setImageFile(null);
             p.setImageLocation(null);
+            this.productsService.saveProduct(p);
             this.productsService.deleteProduct(id, this.personSession);
             model.addAttribute("product", p.getName());
             model.addAttribute("exist", true);

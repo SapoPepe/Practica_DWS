@@ -100,8 +100,8 @@ public class PersonSession {
         for(Person per : aux){
             for (Comment c : comments){
                 per.deleteComment(c);
-                this.persons.save(per);
             }
+            this.persons.save(per);
         }
     }
 }

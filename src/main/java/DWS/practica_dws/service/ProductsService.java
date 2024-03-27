@@ -67,6 +67,9 @@ public class ProductsService {
             session.deleteProductFromCarts(p);
             //We need to delete the comments form this product in middle table that associate users with comments because if not it jump off an error
             session.deleteCommentsFromUsers(p.getComments());
+            //We delete all the comments of the product
+            p.removeAllComments();
+            saveProduct(p);
             this.products.delete(p);
             return p;
         }

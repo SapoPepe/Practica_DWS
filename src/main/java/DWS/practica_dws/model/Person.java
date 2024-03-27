@@ -1,5 +1,6 @@
 package DWS.practica_dws.model;
 
+import java.util.HashSet;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -41,7 +42,10 @@ public class Person {
     }
 
     public void unfollowProduct(Product p){
-        this.userProducts.remove(p);
+        for(int i = this.userProducts.size()-1; i >= 0; i--){
+            Product aux = this.userProducts.get(i);
+            if(p.equals(aux)) this.userProducts.remove(i);
+        }
     }
 
     public Collection<Product> cartProducts(){
