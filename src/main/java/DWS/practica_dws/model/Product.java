@@ -1,7 +1,9 @@
 package DWS.practica_dws.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.sql.Blob;
 import java.util.*;
 
 @Entity
@@ -22,7 +24,12 @@ public class Product {
     private List<Comment> comments;
     @ManyToMany
     private List<Person> inUsersShoppingCart;
-    public boolean containsPhoto;
+    private boolean containsPhoto;
+
+    private String imageLocation;
+    @Lob
+    @JsonIgnore
+    private Blob image;
 
 
     public Product() {
@@ -36,6 +43,8 @@ public class Product {
         this.comments = new ArrayList<>();
         this.inUsersShoppingCart = new ArrayList<>();
         this.containsPhoto = false;
+        this.imageLocation = null;
+        this.image = null;
     }
 
     public void setID(Long l){
@@ -75,11 +84,15 @@ public class Product {
         this.comments.remove(c);
     }
 
-/*
-    public List<User> getInUsersShoppingCart() {
+    public Blob getImageFile(){
+        return this.image;
+    }
+
+
+    public List<Person> getInUsersShoppingCart() {
         return inUsersShoppingCart;
     }
-*/
+
     public void updateInfo(String name, String description, double price){
         if(name!=null){
             this.name = name;
@@ -95,6 +108,14 @@ public class Product {
      }
 
 
+     public void setImageLocation(String loc){
+        this.imageLocation =  loc;
+     }
+
+     public void setImageFile(Blob img){
+        this.image = img;
+     }
+
     public void removePerson(Person u){
         this.inUsersShoppingCart.remove(u);
         this.numProductsInCarts--;
@@ -107,5 +128,9 @@ public class Product {
 
     public void setPhoto(boolean hasPhoto){
         this.containsPhoto = hasPhoto;
+    }
+
+    public boolean hasImage(){
+        return this.containsPhoto;
     }
 }

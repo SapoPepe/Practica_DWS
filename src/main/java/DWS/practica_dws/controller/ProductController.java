@@ -5,17 +5,29 @@ import DWS.practica_dws.model.Product;
 import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.ProductsService;
 import DWS.practica_dws.service.PersonSession;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.sql.SQLException;
 import java.util.*;
+
+import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
 @Controller
 public class ProductController {
@@ -43,7 +55,7 @@ public class ProductController {
 
     @PostMapping("/product/new")
     public String newProduct(Model model, @RequestParam String name, @RequestParam (required = false) String description,
-                             @RequestParam(required = false) String price, @RequestParam MultipartFile image) {
+                             @RequestParam(required = false) String price, @RequestParam MultipartFile image, HttpServletRequest request) {
 
         Product p;
 
@@ -56,11 +68,18 @@ public class ProductController {
                 else p = new Product(name, description, priceD);
 
                 model.addAttribute("name", name);
-                this.productsService.saveProduct(p);
                 if(this.productsService.hasImage(image)){
-                    imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
                     p.setPhoto(true);
+                    //Creation of a new URI
+                    URI location = fromCurrentRequest().replacePath("/product").path("/{id}/image").buildAndExpand(p.getId()).toUri();
+                    //Set the product.imageLocation to the new location
+                    p.setImageLocation(location.toString());
+                    //Transform the MultipartFile to a Blob entity
+                    p.setImageFile(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
+
+                    //imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
                 }
+                this.productsService.saveProduct(p);
                 return "saveProduct";
             } else{
                 model.addAttribute("noPrincipals", true);
@@ -76,8 +95,15 @@ public class ProductController {
     }
 
     @GetMapping("/product/{id}/image")
-    public ResponseEntity<Object> downloadImage(@PathVariable int id) throws MalformedURLException {
-        return imageService.createResponseFromImage(PRODUCTS_FOLDER, id);
+    public ResponseEntity<Object> downloadImage(@PathVariable long id) throws MalformedURLException, SQLException {
+        //return imageService.createResponseFromImage(PRODUCTS_FOLDER, id);
+        Product p = this.productsService.getProduct(id).orElseThrow();
+        if(p.hasImage()){
+            Resource file = new InputStreamResource(p.getImageFile().getBinaryStream());
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
+                    .contentLength(p.getImageFile().length())
+                    .body(file);
+        } else return ResponseEntity.notFound().build();
     }
 
 
@@ -87,7 +113,7 @@ public class ProductController {
         Product product = p.get();
         model.addAttribute("product", product);
         model.addAttribute("commentList", product.getComments());
-        if (this.imageService.imageExist(PRODUCTS_FOLDER, id)) model.addAttribute("containsPhoto", true);
+        if (product.hasImage()) model.addAttribute("containsPhoto", true);
         else model.addAttribute("containsPhoto", false);
 
         return "showProduct";
@@ -95,18 +121,15 @@ public class ProductController {
 
 
     @PostMapping("/product/{id}/delete")
-    public String deleteProduct(Model model, @PathVariable long id) throws IOException {
+    public String deleteProduct(Model model, @PathVariable long id){
         Optional<Product> aux = this.productsService.getProduct(id);
 
         //If aux contains something we delete that product
         if(aux.isPresent()){
             Product p = aux.get();
+            p.setImageFile(null);
+            p.setImageLocation(null);
             this.productsService.deleteProduct(id, this.personSession);
-            try {
-                imageService.deleteImage(PRODUCTS_FOLDER, p.getId());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
             model.addAttribute("product", p.getName());
             model.addAttribute("exist", true);
         } else model.addAttribute("exist", false);
@@ -130,16 +153,23 @@ public class ProductController {
         Optional<Product> aux = this.productsService.getProduct(id);
         Product p = aux.get();
         p.updateInfo(name, description, price);
-        this.productsService.saveProduct(p);
-        model.addAttribute("product", p);
 
         try {
-            if (this.productsService.hasImage(image)) this.imageService.modifyImage("products", id, image, model);
+            if (this.productsService.hasImage(image)) {
+                p.setPhoto(true);
+                //Creation of a new URI
+                URI location = fromCurrentRequest().replacePath("/product").path("/{id}/image").buildAndExpand(p.getId()).toUri();
+                //Set the product.imageLocation to the new location
+                p.setImageLocation(location.toString());
+                //Transform the MultipartFile to a Blob entity
+                p.setImageFile(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
+            }
         } catch (IOException e) {
-            // Handle exception
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
+        this.productsService.saveProduct(p);
+        model.addAttribute("product", p);
         return "showProduct";
     }
 
