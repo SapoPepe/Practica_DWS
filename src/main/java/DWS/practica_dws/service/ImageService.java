@@ -1,6 +1,8 @@
 package DWS.practica_dws.service;
 
+import DWS.practica_dws.model.Image;
 import DWS.practica_dws.model.Product;
+import DWS.practica_dws.repository.ProductRepository;
 import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -23,11 +25,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Base64;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
 @Service
 public class ImageService {
+	@Autowired
+	private ProductRepository products;
 	private static final String basePath = "/product";
 	private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
@@ -44,6 +49,7 @@ public class ImageService {
 		URI location = this.createFilePath(p.getId());
 		p.setImageLocation(location.toString());
 		p.setImageFile(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
+		products.saveAndFlush(p);
 	}
 
 	public ResponseEntity<Object> getImage(Product p) throws SQLException {
@@ -60,6 +66,7 @@ public class ImageService {
 		p.setPhoto(false);
 		p.setImageFile(null);
 		p.setImageLocation(null);
+		products.saveAndFlush(p);
 	}
 
 	/*
@@ -85,4 +92,11 @@ public class ImageService {
 		Resource file = new UrlResource(imagePath.toUri());
         return Files.exists(imagePath);
 	}*/
+
+	public void saveImage(Product p, Image image) throws IOException {
+		URI location = this.createFilePath(p.getId());
+		p.setImageLocation(location.toString());
+		p.setImageFile(BlobProxy.generateProxy(Base64.getDecoder().decode(image.getImageBase64())));
+		products.saveAndFlush(p);
+	}
 }

@@ -1,6 +1,27 @@
 package DWS.practica_dws.controller;
 
-/*@RestController
+import DWS.practica_dws.model.Comment;
+import DWS.practica_dws.model.CustomError;
+import DWS.practica_dws.model.Image;
+import DWS.practica_dws.model.Product;
+import DWS.practica_dws.service.ImageService;
+import DWS.practica_dws.service.PersonSession;
+import DWS.practica_dws.service.ProductsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Blob;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Optional;
+
+@RestController
 @RequestMapping("/api")
 public class ProductRestController {
     @Autowired
@@ -42,22 +63,22 @@ public class ProductRestController {
 
     @DeleteMapping("/products/{id}")
     public ResponseEntity deleteProduct(@PathVariable long id){
-        if(productsService.getProduct(id)==null) {
+        if(!productsService.getProduct(id).isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        productsService.deleteProduct(id);
+        productsService.deleteProduct(id, userSession);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/products/{id}")
     public ResponseEntity editProduct(@RequestBody Product product, @PathVariable long id){
-        Product oldProduct;
+        Optional <Product> oldProduct;
         if(product.getName()!=null || product.getPrice()>0 || product.getDescription()!=null){
             oldProduct=productsService.getProduct(id);
-            if(oldProduct==null) {
+            if(!oldProduct.isPresent()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-            oldProduct.updateInfo(product.getName(), product.getDescription(), product.getPrice());
+            oldProduct.get().updateInfo(product.getName(), product.getDescription(), product.getPrice());
             this.productsService.saveProduct(product);
             //imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
             return new ResponseEntity<>(oldProduct, HttpStatus.OK);
@@ -68,18 +89,18 @@ public class ProductRestController {
 
     @GetMapping("/products/{id}")
     public ResponseEntity showProduct(@PathVariable long id){
-    if(productsService.getProduct(id)==null) {
+    if(!productsService.getProduct(id).isPresent()) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }else {
-        Product product = productsService.getProduct(id);
-        return new ResponseEntity<>(product, HttpStatus.OK);
+        Optional<Product> product = productsService.getProduct(id);
+        return new ResponseEntity<>(product.get(), HttpStatus.OK);
     }
     }
 
     //followProduct
     @GetMapping("/user/shoppingCart")
     public ResponseEntity showShoppingCart(){
-        Collection<Product> list = productsService.availableProducts(userSession.userProducts());
+        Collection<Product> list = productsService.availableProducts(userSession.personProducts());
         if(!list.isEmpty()){
             return new ResponseEntity<>(list, HttpStatus.OK);
         } else {
@@ -91,8 +112,8 @@ public class ProductRestController {
     @PostMapping("/user/shoppingCart")
     public ResponseEntity addShoppingCart(@RequestParam long productId){
         //Long identification = Long.parseLong(id);
-        if(productsService.getProduct(productId)!=null){
-            this.userSession.follow(productsService.getProduct(productId));
+        if(productsService.getProduct(productId).isPresent()){
+            this.userSession.follow(productId);
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -102,7 +123,7 @@ public class ProductRestController {
     @DeleteMapping("/user/shoppingCart")
     public ResponseEntity deleteShoppingCart(@RequestParam long productId){
         //Long identification = Long.parseLong(id);
-        if(productsService.getProduct(productId)!=null){
+        if(productsService.getProduct(productId).isPresent()){
             productsService.removeProductFromCart(productId, userSession);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
@@ -113,11 +134,11 @@ public class ProductRestController {
 
     @PostMapping("/products/{productId}/comments")
     public ResponseEntity addComment(@PathVariable long productId, @RequestBody Comment comment){
-        Product product = this.productsService.getProduct(productId);
+        Optional<Product> product = this.productsService.getProduct(productId);
 
         //If the product exist and the comment is well-formed, it's add to the product
-        if(product!=null && this.productsService.correctComment(comment.getUserName(), comment.getScore())){
-            product.addComment(comment);
+        if(product.isPresent() && this.productsService.correctComment(comment.getUserName(), comment.getScore())){
+            product.get().addComment(comment);
             userSession.getUser().addComment(comment);
             return new ResponseEntity<>(comment, HttpStatus.OK);
         } else {
@@ -129,26 +150,24 @@ public class ProductRestController {
 
     @DeleteMapping("/products/{id}/comments/{CID}")
     public ResponseEntity deleteComment(@PathVariable long id, @PathVariable int CID){
-        if(productsService.getProduct(id)==null) {
+        if(!productsService.getProduct(id).isPresent()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        Product product = productsService.getProduct(id);
-        product.removeComment(CID);
+        productsService.deleteCommentFromProduct(id, CID);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/products/{id}/image")
     public ResponseEntity addImage(@RequestBody Image image, @PathVariable long id){
-        Path folder = IMAGES_FOLDER.resolve("products");
-        byte[] imageByte;
+        Optional <Product> p;
         try {
-            Files.createDirectories(folder);
-            Path imagePath = folder.resolve(String.valueOf(id) + ".jpeg");
-            imageByte = Base64.getDecoder().decode(image.getImageBase64());
-            FileOutputStream fileOuputStream = new FileOutputStream(imagePath.toFile());
-            fileOuputStream.write(imageByte);
-            fileOuputStream.close();
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+             p = productsService.getProduct(id);
+             if(p.isPresent()){
+                 imageService.saveImage(p.get(), image);
+                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+             }else{
+                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+             }
         }catch (Exception exception){
             return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -156,20 +175,18 @@ public class ProductRestController {
 
     @GetMapping("/products/{id}/image")
     public ResponseEntity getImage(@PathVariable long id){
-        Image image;
-        Path folder = IMAGES_FOLDER.resolve("products");
+        Optional <Product> p;
+        Image image = new Image();
         try {
-            Files.createDirectories(folder);
-            Path imagePath = folder.resolve(String.valueOf(id) + ".jpeg");
-            byte[] fileArray = new byte[(int) imagePath.toFile().length()];
-
-            FileInputStream fileInputStream = new FileInputStream(imagePath.toFile());
-            fileInputStream.read(fileArray);
-            fileInputStream.close();
-            String imageByte = Base64.getEncoder().encodeToString(fileArray);
-            image = new Image();
-            image.setImageBase64(imageByte);
-            return new ResponseEntity<>(image, HttpStatus.OK);
+            p = productsService.getProduct(id);
+            if(p.isPresent()){
+                Blob blob = p.get().getImageFile();
+                byte[] bytes = blob.getBytes(0,(int)blob.length());
+                image.setImageBase64(Base64.getEncoder().encodeToString(bytes));
+                return new ResponseEntity<>(image, HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         }catch (Exception exception){
             return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -177,9 +194,15 @@ public class ProductRestController {
 
     @DeleteMapping("/products/{id}/image")
     public ResponseEntity deleteImage(@PathVariable long id){
+        Optional <Product> p;
         try{
-            imageService.deleteImage("products", id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            p = productsService.getProduct(id);
+            if(p.isPresent()) {
+                imageService.deleteImage(p.get());
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }else{
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         }catch (Exception exception){
             return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -187,21 +210,18 @@ public class ProductRestController {
 
     @PutMapping("/products/{id}/image")
     public ResponseEntity editImage(@PathVariable long id, @RequestBody Image image){
-        Path folder = IMAGES_FOLDER.resolve("products");
-        byte[] imageByte;
+        Optional <Product> p;
         try {
-            imageService.deleteImage("products", id);
-            Files.createDirectories(folder);
-            Path imagePath = folder.resolve(String.valueOf(id) + ".jpeg");
-            imageByte = Base64.getDecoder().decode(image.getImageBase64());
-            FileOutputStream fileOuputStream = new FileOutputStream(imagePath.toFile());
-            fileOuputStream.write(imageByte);
-            fileOuputStream.close();
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            p = productsService.getProduct(id);
+            if(p.isPresent()){
+                imageService.saveImage(p.get(), image);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }else{
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         }catch (Exception exception){
             return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 }
-*/

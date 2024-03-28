@@ -48,7 +48,7 @@ public class ProductsService {
     }
 
     public void saveProduct(Product p){
-        this.products.save(p);
+        this.products.saveAndFlush(p);
     }
 
     public Collection<Product> getAll(){
@@ -77,7 +77,7 @@ public class ProductsService {
     }
 
     public void saveComment(Comment c){
-        this.comments.save(c);
+        this.comments.saveAndFlush(c);
     }
 
     public void deleteComment(long CID){
@@ -94,12 +94,13 @@ public class ProductsService {
         return this.comments.findById(CID).orElseThrow();
     }
 
-/*
     public void removeProductFromCart(long id, PersonSession userSession) {
         Optional<Product> productToRemove = this.products.findById(id);
-        userSession.unfollow(productToRemove);
+        if(productToRemove.isPresent()){
+            userSession.unfollow(id);
+        }
     }
-*/
+
     public List<Product> getProductsByName(String productName) {
         return this.products.findProductByName(productName);
     }
