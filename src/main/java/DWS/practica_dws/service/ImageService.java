@@ -1,43 +1,68 @@
 package DWS.practica_dws.service;
 
+import DWS.practica_dws.model.Product;
+import org.hibernate.engine.jdbc.BlobProxy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
+
+import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
 @Service
 public class ImageService {
+	private static final String basePath = "/product";
 	private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
-	private Path createFilePath(long imageId, Path folder) {
-		return folder.resolve(imageId + ".jpeg");
+	private URI createFilePath(long id) {
+		return fromCurrentRequest().replacePath(basePath).path("/{id}/image").buildAndExpand(id).toUri();
 	}
 
-	public void saveImage(String folderName, long productId, MultipartFile image, Model model) throws IOException {
-		Path folder = IMAGES_FOLDER.resolve("products");
-		Files.createDirectories(folder);
-		Path imagePath = folder.resolve(String.valueOf(productId) + ".jpeg");
-		image.transferTo(imagePath);
-		model.addAttribute("imageId", String.valueOf(productId));
+	public boolean admitedImage(MultipartFile image){
+		String originalName = image.getOriginalFilename();
+		if(!originalName.matches(".*\\.(jpg|jpeg|gif|png)")) return false;
+		return true;
+	}
+	public void saveImage(Product p, MultipartFile image) throws IOException {
+		URI location = this.createFilePath(p.getId());
+		p.setImageLocation(location.toString());
+		p.setImageFile(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
 	}
 
-	public void deleteImage(String folderName, long imageId) throws IOException {
-		Path folder = IMAGES_FOLDER.resolve(folderName);
-		Path imageFile = createFilePath(imageId, folder);
-		Files.deleteIfExists(imageFile);
+	public ResponseEntity<Object> getImage(Product p) throws SQLException {
+		if(p.hasImage()){
+			Resource file = new InputStreamResource(p.getImageFile().getBinaryStream());
+			return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
+					.contentLength(p.getImageFile().length())
+					.body(file);
+		} else return ResponseEntity.notFound().build();
 	}
 
+
+	public void deleteImage(Product p){
+		p.setPhoto(false);
+		p.setImageFile(null);
+		p.setImageLocation(null);
+	}
+
+	/*
 	public void modifyImage(String folderName, long productId, MultipartFile newImage, Model model) throws IOException {
 		deleteImage(folderName, productId);
 		saveImage(folderName, productId, newImage, model);
@@ -59,5 +84,5 @@ public class ImageService {
 		Path imagePath = createFilePath(imageId, folder);
 		Resource file = new UrlResource(imagePath.toUri());
         return Files.exists(imagePath);
-	}
+	}*/
 }

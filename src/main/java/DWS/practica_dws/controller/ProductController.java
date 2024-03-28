@@ -62,7 +62,7 @@ public class ProductController {
         try{
             double priceD = Double.parseDouble(price);
             //If it doens't have the principal of the product
-            if(this.productsService.hasPrincipals(name, priceD)){
+            if(this.productsService.hasPrincipals(name, priceD) && this.imageService.admitedImage(image)){
 
                 if(!this.productsService.hasDescription(description)) p = new Product(name, "Producto sin descripción", priceD);
                 else p = new Product(name, description, priceD);
@@ -70,14 +70,7 @@ public class ProductController {
                 model.addAttribute("name", name);
                 if(this.productsService.hasImage(image)){
                     p.setPhoto(true);
-                    //Creation of a new URI
-                    URI location = fromCurrentRequest().replacePath("/product").path("/{id}/image").buildAndExpand(p.getId()).toUri();
-                    //Set the product.imageLocation to the new location
-                    p.setImageLocation(location.toString());
-                    //Transform the MultipartFile to a Blob entity
-                    p.setImageFile(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
-
-                    //imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
+                    this.imageService.saveImage(p, image);
                 }
                 this.productsService.saveProduct(p);
                 return "saveProduct";
@@ -98,12 +91,7 @@ public class ProductController {
     public ResponseEntity<Object> downloadImage(@PathVariable long id) throws MalformedURLException, SQLException {
         //return imageService.createResponseFromImage(PRODUCTS_FOLDER, id);
         Product p = this.productsService.getProduct(id).orElseThrow();
-        if(p.hasImage()){
-            Resource file = new InputStreamResource(p.getImageFile().getBinaryStream());
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
-                    .contentLength(p.getImageFile().length())
-                    .body(file);
-        } else return ResponseEntity.notFound().build();
+        return this.imageService.getImage(p);
     }
 
 
@@ -128,8 +116,7 @@ public class ProductController {
         if(aux.isPresent()){
             Product p = aux.get();
             //We first delete the image from the DB and then the product entity
-            p.setImageFile(null);
-            p.setImageLocation(null);
+            this.imageService.deleteImage(p);
             this.productsService.saveProduct(p);
             this.productsService.deleteProduct(id, this.personSession);
             model.addAttribute("product", p.getName());
@@ -151,23 +138,13 @@ public class ProductController {
     @PostMapping("/product/{id}/modify")
     public String editProduct(Model model, @PathVariable long id, @RequestParam(required = false) String name,
                               @RequestParam(required = false) double price, @RequestParam(required = false) String description,
-                              @RequestParam(required = false) MultipartFile image) {
+                              @RequestParam(required = false) MultipartFile image) throws IOException {
         Optional<Product> aux = this.productsService.getProduct(id);
         Product p = aux.get();
         p.updateInfo(name, description, price);
 
-        try {
-            if (this.productsService.hasImage(image)) {
-                p.setPhoto(true);
-                //Creation of a new URI
-                URI location = fromCurrentRequest().replacePath("/product").path("/{id}/image").buildAndExpand(p.getId()).toUri();
-                //Set the product.imageLocation to the new location
-                p.setImageLocation(location.toString());
-                //Transform the MultipartFile to a Blob entity
-                p.setImageFile(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if(this.imageService.admitedImage(image)){
+            this.imageService.saveImage(p, image);
         }
 
         this.productsService.saveProduct(p);
