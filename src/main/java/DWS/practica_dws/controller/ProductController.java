@@ -40,9 +40,20 @@ public class ProductController {
     private ImageService imageService = new ImageService();
 
     @GetMapping("/")
-    public String showProducts(Model model, HttpSession httpSession){
+    public String showProducts(Model model, HttpSession httpSession, @RequestParam(required = false) Double min,
+                               @RequestParam(required = false) Double max, @RequestParam(required = false) String type){
         //if(httpSession.isNew()) this.userSession = new PersonSession();
-        model.addAttribute("products", this.productsService.getAll());
+        if(max==null && min==null && (type==null || type.isEmpty())){
+            model.addAttribute("incorrect_filter", false);
+            model.addAttribute("products", this.productsService.getAll());
+        }
+        else if(this.productsService.correctFilter(min, max)){
+            model.addAttribute("incorrect_filter", false);
+            model.addAttribute("products", this.productsService.getAll(min, max, type));
+        } else {
+            model.addAttribute("incorrect_filter", true);
+            model.addAttribute("products", this.productsService.getAll());
+        }
         return "index";
     }
 
@@ -55,7 +66,8 @@ public class ProductController {
 
     @PostMapping("/product/new")
     public String newProduct(Model model, @RequestParam String name, @RequestParam (required = false) String description,
-                             @RequestParam(required = false) String price, @RequestParam MultipartFile image, HttpServletRequest request) {
+                             @RequestParam(required = false) String price, @RequestParam(required = false) String type,
+                             @RequestParam MultipartFile image, HttpServletRequest request) {
 
         Product p;
 
@@ -64,8 +76,8 @@ public class ProductController {
             //If it doens't have the principal of the product
             if(this.productsService.hasPrincipals(name, priceD) && this.imageService.admitedImage(image)){
 
-                if(!this.productsService.hasDescription(description)) p = new Product(name, "Producto sin descripción", priceD);
-                else p = new Product(name, description, priceD);
+                if(!this.productsService.hasDescription(description)) p = new Product(name, "Producto sin descripción", priceD, "");
+                else p = new Product(name, description, priceD, type);
 
                 model.addAttribute("name", name);
                 if(this.productsService.hasImage(image)){
@@ -138,12 +150,12 @@ public class ProductController {
     @PostMapping("/product/{id}/modify")
     public String editProduct(Model model, @PathVariable long id, @RequestParam(required = false) String name,
                               @RequestParam(required = false) double price, @RequestParam(required = false) String description,
-                              @RequestParam(required = false) MultipartFile image) throws IOException {
+                              @RequestParam(required = false) String type, @RequestParam(required = false) MultipartFile image) throws IOException {
         Optional<Product> aux = this.productsService.getProduct(id);
         Product p = aux.get();
-        p.updateInfo(name, description, price);
+        p.updateInfo(name, description, price, type);
 
-        if(this.imageService.admitedImage(image)){
+        if(image!=null && !image.isEmpty() && this.imageService.admitedImage(image)){
             this.imageService.saveImage(p, image);
         }
 
@@ -216,9 +228,23 @@ public class ProductController {
     }
 
     @GetMapping("/searchProduct")
-    public String searchProduct(Model model, @RequestParam String productName) {
-        List<Product> matchingProducts = this.productsService.getProductsByName(productName);
-        model.addAttribute("products", matchingProducts);
+    public String searchProduct(Model model, @RequestParam String productName, @RequestParam(required = false) Double min,
+                                @RequestParam(required = false) Double max, @RequestParam(required = false) String type) {
+        if(max==null && min==null && (type==null || type.isEmpty())){
+            model.addAttribute("incorrect_filter", false);
+            model.addAttribute("productName", productName);
+            model.addAttribute("products", this.productsService.getProductsByName(productName));
+        }
+        else if(this.productsService.correctFilter(min, max)){
+            model.addAttribute("incorrect_filter", false);
+            model.addAttribute("productName", productName);
+            model.addAttribute("products", this.productsService.getProductByNameWithFilter(productName, min, max, type));
+        } else {
+            model.addAttribute("incorrect_filter", true);
+            model.addAttribute("productName", productName);
+            model.addAttribute("products", this.productsService.getProductsByName(productName));
+        }
+
         return "searchResults";
     }
 

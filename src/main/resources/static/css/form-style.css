@@ -73,6 +73,21 @@ body {
     border: .1vw solid #414141;
 }
 
+.form-select{
+    width: 30%;
+    background-color: unset;
+    border-radius: .5vw;
+    color: white;
+    height: 2.5vw;
+    padding-left: .5vw;
+    font-size: 1.3vw;
+}
+
+.form-select option{
+    background-color: white;
+    color: black;
+}
+
 .form-container .form-group textarea {
     padding: 1vw 1.2vw;
     border-radius: .8vw;

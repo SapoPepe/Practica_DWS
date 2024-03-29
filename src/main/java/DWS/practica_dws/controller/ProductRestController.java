@@ -37,7 +37,7 @@ public class ProductRestController {
     public ResponseEntity<Collection<Product>> showAllProducts(@RequestParam(required = false) String search){
         Collection<Product> list;
         if(search==null) {
-            list = productsService.getAll();
+            list = this.productsService.getAll();
         }else {
             list = productsService.getProductsByName(search);
         }
@@ -78,7 +78,7 @@ public class ProductRestController {
             if(!oldProduct.isPresent()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-            oldProduct.get().updateInfo(product.getName(), product.getDescription(), product.getPrice());
+            oldProduct.get().updateInfo(product.getName(), product.getDescription(), product.getPrice(), product.getType());
             this.productsService.saveProduct(product);
             //imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
             return new ResponseEntity<>(oldProduct, HttpStatus.OK);

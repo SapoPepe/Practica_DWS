@@ -42,7 +42,7 @@ public class ImageService {
 
 	public boolean admitedImage(MultipartFile image){
 		String originalName = image.getOriginalFilename();
-		if(!originalName.matches(".*\\.(jpg|jpeg|gif|png)")) return false;
+		if(image!=null && !image.isEmpty() && !originalName.matches(".*\\.(jpg|jpeg|gif|png)")) return false;
 		return true;
 	}
 	public void saveImage(Product p, MultipartFile image) throws IOException {

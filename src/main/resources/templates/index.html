@@ -50,6 +50,33 @@
 </div>
 <hr>
 
+
+<div class="filter-container">
+    {{#incorrect_filter}}
+    <p>Datos de filtros incorrectos</p>
+    {{/incorrect_filter}}
+    <form class="filter" action="/">
+        <div class="input-price input-filter">
+            <input name="min" type="number" min="0" class="form-control" placeholder="Precio mínimo">
+        </div>
+        <div class="input-price input-filter">
+            <input name="max" type="number" min="0" class="form-control" placeholder="Precio máximo">
+        </div>
+        <div class="input-type input-filter">
+            <select class="form-select" name="type">
+                <option selected value="">Categoría</option>
+                <option value="Farmacia">Farmacia</option>
+                <option value="Comida">Comida</option>
+            </select>
+        </div>
+        <div class="col">
+            <input class="btn btn-outline-primary" type="submit" value="Search">
+        </div>
+    </form>
+</div>
+
+
+
 <div class="all-products">
     {{#products}}
     <div class="product-container">

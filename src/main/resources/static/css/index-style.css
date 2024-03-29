@@ -77,6 +77,54 @@
     text-align: center;
 }
 
+/************************ Filter ***********************************/
+.filter-container {
+    margin-top: 2vw;
+    margin-bottom: 2vw;
+}
+
+.input-filter{
+    width: 13vw;
+    height: 2vw;
+}
+
+.filter-container p{
+    display: flex;
+    justify-content: center;
+    font-family: Arial;
+    color: #bd1e1e;
+    font-size: 1.3vw;
+}
+
+.filter {
+    display: flex;
+    gap: 4%;
+    justify-content: center;
+}
+
+
+.input-price input,
+.input-type select,
+.btn-outline-primary {
+    width: 100%;
+    border-radius: 2vw;
+    border: unset;
+    background: gainsboro;
+    height: 2vw;
+    padding-left: 1vw;
+    font-size: 1.3vw;
+}
+
+.btn-outline-primary{
+    background: #82ee82 !important;
+    padding: unset !important;
+    width: 7vw;
+}
+
+
+
+
+
 
 /*********************** Product container ***********************+*/
 .all-products{

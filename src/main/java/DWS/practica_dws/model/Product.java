@@ -17,6 +17,7 @@ public class Product {
     private int numProductsInCarts;
     private double price;
     private String name;
+    private String type;
     @Lob
     private String description;
     //If the Product is being deleted, all their comments are deleted too
@@ -35,7 +36,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(String name, String description, double price){
+    public Product(String name, String description, double price, String type){
         this.name = name;
         this.description = description;
         this.price = price;
@@ -45,6 +46,7 @@ public class Product {
         this.containsPhoto = false;
         this.imageLocation = null;
         this.image = null;
+        this.type = type;
     }
 
     public void setID(Long l){
@@ -92,17 +94,20 @@ public class Product {
         return this.image;
     }
 
+    public String getType(){
+        return this.type;
+    }
+
 
     public List<Person> getInUsersShoppingCart() {
         return inUsersShoppingCart;
     }
 
-    public void updateInfo(String name, String description, double price){
-        if(name!=null){
-            this.name = name;
-        }if(price!=0){
-            this.price = price;
-        }if(description!= null){
+    public void updateInfo(String name, String description, double price, String type){
+        if(name!=null) this.name = name;
+        if(price!=0) this.price = price;
+        if(type!=null && !type.isEmpty()) this.type = type;
+        if(description!= null){
             if(description.isEmpty()){
                 this.description = "Producto sin descripción";
             }else{
