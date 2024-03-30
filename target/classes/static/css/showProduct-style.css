@@ -289,8 +289,8 @@
     padding: 1vw 1vw;
 }
 
-.modal__body p{
-    color: red;
+.error{
+    color: red; !important;
 }
 
 .modal__footer {
