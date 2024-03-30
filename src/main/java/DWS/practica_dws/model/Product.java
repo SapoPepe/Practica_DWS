@@ -18,6 +18,8 @@ public class Product {
     private double price;
     private String name;
     private String type;
+    private String fileName;
+    private boolean containsFile;
     @Lob
     private String description;
     //If the Product is being deleted, all their comments are deleted too
@@ -25,18 +27,19 @@ public class Product {
     private List<Comment> comments;
     @ManyToMany
     private List<Person> inUsersShoppingCart;
-    private boolean containsPhoto;
 
     private String imageLocation;
     @Lob
     @JsonIgnore
     private Blob image;
+    private boolean containsPhoto;
+
 
 
     public Product() {
     }
 
-    public Product(String name, String description, double price, String type){
+    public Product(String name, String description, double price, String type, String fileName){
         this.name = name;
         this.description = description;
         this.price = price;
@@ -47,6 +50,8 @@ public class Product {
         this.imageLocation = null;
         this.image = null;
         this.type = type;
+        this.fileName = fileName;
+        this.containsFile = false;
     }
 
     public void setID(Long l){
@@ -141,5 +146,18 @@ public class Product {
 
     public boolean hasImage(){
         return this.containsPhoto;
+    }
+
+    public void setFile(boolean hasFile, String fileName){
+        this.containsFile = hasFile;
+        this.fileName = fileName;
+    }
+
+    public boolean hasFile(){
+        return this.containsFile;
+    }
+
+    public String getFileName(){
+        return this.fileName;
     }
 }

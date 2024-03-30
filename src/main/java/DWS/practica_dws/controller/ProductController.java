@@ -2,6 +2,7 @@ package DWS.practica_dws.controller;
 
 import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.Product;
+import DWS.practica_dws.service.FileService;
 import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.ProductsService;
 import DWS.practica_dws.service.PersonSession;
@@ -35,6 +36,8 @@ public class ProductController {
     private PersonSession personSession;
     @Autowired
     private ProductsService productsService;
+    @Autowired
+    private FileService fileService;
 
     private static final String PRODUCTS_FOLDER = "products";
     private ImageService imageService = new ImageService();
@@ -67,24 +70,27 @@ public class ProductController {
     @PostMapping("/product/new")
     public String newProduct(Model model, @RequestParam String name, @RequestParam (required = false) String description,
                              @RequestParam(required = false) String price, @RequestParam(required = false) String type,
-                             @RequestParam MultipartFile image, HttpServletRequest request) {
+                             @RequestParam MultipartFile image, @RequestParam MultipartFile file, HttpServletRequest request) {
 
         Product p;
 
         try{
             double priceD = Double.parseDouble(price);
             //If it doens't have the principal of the product
-            if(this.productsService.hasPrincipals(name, priceD) && this.imageService.admitedImage(image)){
+            if(this.productsService.hasPrincipals(name, priceD) && this.imageService.admitedImage(image) && this.fileService.admitedFile(file)){
 
-                if(!this.productsService.hasDescription(description)) p = new Product(name, "Producto sin descripción", priceD, "");
-                else p = new Product(name, description, priceD, type);
+                //Create the product if it has description or not
+                if(!this.productsService.hasDescription(description)) p = new Product(name, "Producto sin descripción", priceD, "", null);
+                else p = new Product(name, description, priceD, type, null);
 
-                model.addAttribute("name", name);
-                if(this.productsService.hasImage(image)){
-                    p.setPhoto(true);
-                    this.imageService.saveImage(p, image);
-                }
+                //If it has image, it will be upload to the database and the product will include the direction of the image
+                if(this.imageService.hasImage(image)) this.imageService.saveImage(p, image);
+
+                //If it has a PDF file, it will be save in memory and the product will have the name of it's file
+                if(this.fileService.hasFile(file)) this.fileService.saveFile(PRODUCTS_FOLDER, p, file);
+
                 this.productsService.saveProduct(p);
+                model.addAttribute("name", name);
                 return "saveProduct";
             } else{
                 model.addAttribute("noPrincipals", true);
@@ -106,6 +112,11 @@ public class ProductController {
         return this.imageService.getImage(p);
     }
 
+    @GetMapping("/product/{id}/file")
+    public ResponseEntity<Object> downloadFile(@PathVariable long id) throws MalformedURLException{
+        return fileService.createResponseFromImage(PRODUCTS_FOLDER, id);
+    }
+
 
     @GetMapping("/product/{id}")
     public String showProduct(Model model, @PathVariable Long id) throws MalformedURLException {
@@ -121,7 +132,7 @@ public class ProductController {
 
 
     @PostMapping("/product/{id}/delete")
-    public String deleteProduct(Model model, @PathVariable long id){
+    public String deleteProduct(Model model, @PathVariable long id) throws IOException {
         Optional<Product> aux = this.productsService.getProduct(id);
 
         //If aux contains something we delete that product
@@ -129,6 +140,7 @@ public class ProductController {
             Product p = aux.get();
             //We first delete the image from the DB and then the product entity
             this.imageService.deleteImage(p);
+            this.fileService.deleteFile(PRODUCTS_FOLDER, p.getId());
             this.productsService.saveProduct(p);
             this.productsService.deleteProduct(id, this.personSession);
             model.addAttribute("product", p.getName());
@@ -150,13 +162,21 @@ public class ProductController {
     @PostMapping("/product/{id}/modify")
     public String editProduct(Model model, @PathVariable long id, @RequestParam(required = false) String name,
                               @RequestParam(required = false) double price, @RequestParam(required = false) String description,
-                              @RequestParam(required = false) String type, @RequestParam(required = false) MultipartFile image) throws IOException {
+                              @RequestParam(required = false) String type, @RequestParam(required = false) MultipartFile file,
+                              @RequestParam(required = false) MultipartFile image) throws IOException {
         Optional<Product> aux = this.productsService.getProduct(id);
         Product p = aux.get();
+
+        //For the information
         p.updateInfo(name, description, price, type);
 
-        if(image!=null && !image.isEmpty() && this.imageService.admitedImage(image)){
-            this.imageService.saveImage(p, image);
+        //For the image
+        if(image!=null && !image.isEmpty() && this.imageService.admitedImage(image)) this.imageService.saveImage(p, image);
+
+        //For the file
+        if(file!=null && !file.isEmpty() && this.fileService.admitedFile(file)){
+            if(p.hasFile()) this.fileService.deleteFile(PRODUCTS_FOLDER, p.getId());    //Delete the old file
+            this.fileService.saveFile(PRODUCTS_FOLDER, p, file);        //Keep the new file
         }
 
         this.productsService.saveProduct(p);

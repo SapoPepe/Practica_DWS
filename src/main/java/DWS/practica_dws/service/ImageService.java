@@ -32,6 +32,9 @@ import static org.springframework.web.servlet.support.ServletUriComponentsBuilde
 
 @Service
 public class ImageService {
+	@Autowired
+	private ProductsService products;
+
 	private static final String basePath = "/product";
 	private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
@@ -44,11 +47,12 @@ public class ImageService {
 		if(image!=null && !image.isEmpty() && !originalName.matches(".*\\.(jpg|jpeg|gif|png)")) return false;
 		return true;
 	}
+
 	public void saveImage(Product p, MultipartFile image) throws IOException {
+		p.setPhoto(true);
 		URI location = this.createFilePath(p.getId());
 		p.setImageLocation(location.toString());
 		p.setImageFile(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
-		//products.saveAndFlush(p);
 	}
 
 	public ResponseEntity<Object> getImage(Product p) throws SQLException {
@@ -65,7 +69,6 @@ public class ImageService {
 		p.setPhoto(false);
 		p.setImageFile(null);
 		p.setImageLocation(null);
-		//products.saveAndFlush(p);
 	}
 
 	/*
@@ -96,6 +99,10 @@ public class ImageService {
 		URI location = this.createFilePath(p.getId());
 		p.setImageLocation(location.toString());
 		p.setImageFile(BlobProxy.generateProxy(Base64.getDecoder().decode(image.getImageBase64())));
-		//products.saveAndFlush(p);
+		this.products.saveProduct(p);
+	}
+
+	public boolean hasImage(MultipartFile image){
+		return image!=null && !image.isEmpty();
 	}
 }
