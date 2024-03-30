@@ -135,10 +135,10 @@
                             <label class="input__label">Calificación</label>
                             <input class="input__field" type="number" name="score" min="0" max="10">
                         </div>
-                        <!-- class "input" in css doesn't allow proper usage of the editor, it will be fixed (lines 131-136) -->
                         <div class="input">
                             <label class="input__label">Comentario</label>
-                            <div id="editor"><textarea class="input_field input_field--textarea" name="opinion"></textarea></div>
+                            <div id="editor" class="input_field input_field--textarea" style="min-height: 200px;"></div>
+                            <textarea name="opinion" style="display: none;"></textarea>
                             <script src="/js/quill-config.js"></script>
                         </div>
                     </div>

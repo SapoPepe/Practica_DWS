@@ -129,7 +129,7 @@
 }
 
 .product-svg {
-    width: 1.5vw;
+    width: 1.7vw;
     transition-duration: .3s;
 }
 
@@ -168,6 +168,15 @@
     content: "Editar";
 }
 
+#pdf-button::before {
+    position: absolute;
+    left: -2vw;
+    color: white;
+    transition-duration: .3s;
+    font-size: 1vw;
+    content: "PDF";
+}
+
 .product-button:hover::before {
     font-size: 1vw;
     opacity: 1;
@@ -180,6 +189,10 @@
 
 #edit-button:hover::before{
     transform: translateX(155%);
+}
+
+#pdf-button:hover::before{
+    transform: translateX(200%);
 }
 
 #cart-button{
@@ -196,6 +209,14 @@
 
 #edit-button:hover{
     background-color: rgb(255, 119, 10);
+}
+
+#pdf-button{
+    background-color: #73b660;
+}
+
+#pdf-button:hover{
+    background-color: rgb(89, 236, 47);
 }
 
 
