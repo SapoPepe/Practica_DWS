@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Blob;
@@ -80,7 +77,6 @@ public class ProductRestController {
             }
             oldProduct.get().updateInfo(product.getName(), product.getDescription(), product.getPrice(), product.getType());
             this.productsService.saveProduct(product);
-            //imageService.saveImage(PRODUCTS_FOLDER, p.getId(), image, model);
             return new ResponseEntity<>(oldProduct, HttpStatus.OK);
         } else{
             return new ResponseEntity<>(new CustomError("Nothing to change"), HttpStatus.BAD_REQUEST);
@@ -122,7 +118,6 @@ public class ProductRestController {
 
     @DeleteMapping("/user/shoppingCart")
     public ResponseEntity deleteShoppingCart(@RequestParam long productId){
-        //Long identification = Long.parseLong(id);
         if(productsService.getProduct(productId).isPresent()){
             productsService.removeProductFromCart(productId, userSession);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -135,7 +130,6 @@ public class ProductRestController {
     @PostMapping("/products/{productId}/comments")
     public ResponseEntity addComment(@PathVariable long productId, @RequestBody Comment comment){
         Optional<Product> product = this.productsService.getProduct(productId);
-
         //If the product exist and the comment is well-formed, it's add to the product
         if(product.isPresent() && this.productsService.correctComment(comment.getUserName(), comment.getScore())){
             product.get().addComment(comment);
@@ -164,6 +158,7 @@ public class ProductRestController {
              p = productsService.getProduct(id);
              if(p.isPresent()){
                  imageService.saveImage(p.get(), image);
+                 productsService.saveProduct(p.get());
                  return new ResponseEntity<>(HttpStatus.NO_CONTENT);
              }else{
                  return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -199,6 +194,7 @@ public class ProductRestController {
             p = productsService.getProduct(id);
             if(p.isPresent()) {
                 imageService.deleteImage(p.get());
+                productsService.saveProduct(p.get());
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }else{
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -215,6 +211,7 @@ public class ProductRestController {
             p = productsService.getProduct(id);
             if(p.isPresent()){
                 imageService.saveImage(p.get(), image);
+                productsService.saveProduct(p.get());
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }else{
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
