@@ -1,0 +1,99 @@
+.alert-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: .1vw solid black;
+}
+
+#deleteProduct, #error{
+    background: rgba(235 208 0);
+}
+
+#saveProduct, #addToCart{
+    background: rgba(183, 253, 104, 0.38);
+}
+
+.image-alert{
+    align-items: center;
+    width: 27%;
+    height: 10vw;
+}
+
+.image-alert img{
+    width: auto;
+    height: 100%;
+}
+
+#alert-1{
+    margin-left: 2vw;
+}
+
+#alert-2{
+    margin-right: 2vw;
+    display: flex;
+    justify-content: right;
+}
+
+/********************************* Text alert *************************************/
+.text{
+    font-family: Arial;
+    font-size: 2vw;
+    display: grid;
+    justify-content: center;
+    padding-top: 1vw;
+    padding-bottom: 1vw;
+}
+
+/******************************* Buttons ****************************************/
+.buttons-container{
+    display: flex;
+    justify-content: center;
+    gap: 1vw;
+}
+
+.middle-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1vw;
+    appearance: none;
+    border: .2vw solid #1A1A1A;
+    border-radius: 1vw;
+    color: #3B3B3B;
+    cursor: pointer;
+    font-size: 1.5vw;
+    font-weight: 600;
+    width: 18vw;
+    padding: 1vw;
+    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+    user-select: none;
+}
+
+.middle-button svg{
+    width: 2vw;
+    height: 2vw;
+}
+
+
+.middle-button:disabled {
+    pointer-events: none;
+}
+
+.middle-button:hover {
+    color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.25) 0 .8vw 1.5vw;
+    transform: translateY(-.2vw);
+}
+
+.home:hover{
+    background-color: #1A1A1A;
+}
+
+.shoppingCart:hover{
+    background-image: linear-gradient(rgb(8, 72, 145), rgb(75, 141, 239));
+}
+
+.middle-button:active {
+    box-shadow: none;
+    transform: translateY(0);
+}

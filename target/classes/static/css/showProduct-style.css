@@ -1,0 +1,475 @@
+.product{
+    display: flex;
+    width: 80%;
+    margin: 0 auto;
+    margin-top: 3vw;
+    padding: 2vw 2vw 2vw 2vw;
+    gap: 2vw;
+    border: .1vw solid grey;
+    border-radius: 2vw;
+    box-shadow: .5vw 1vw 2vw #111111;
+}
+
+.img-container{
+    height:auto;
+    width: 40%;
+    overflow: hidden;
+    border-radius: 2vw;
+}
+
+.img-container img{
+    height: 100%;
+    width: 100%;
+}
+
+.product-info{
+    width: 60%;
+}
+
+.product-text{
+    font-family: Arial;
+}
+
+.product-text h2{
+    font-size: 2.5vw;
+    margin-bottom: 1vw;
+    text-decoration: .1vw underline;
+}
+
+.product-text h3{
+    font-size: 2vw;
+    margin-top: 0;
+    margin-bottom: 1vw;
+}
+
+.product-text hr{
+    width: 100%;
+    justify-content: left;
+}
+
+.product-text p{
+    font-size: 1.2vw;
+}
+
+/************************ BUTTONS ****************************/
+.product-buttons{
+    display: flex;
+    gap: 1vw;
+}
+
+.delete-button {
+    width: 3vw;
+    height: 3vw;
+    border-radius: 50%;
+    background-color: #da5656;
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition-duration: .3s;
+    overflow: hidden;
+    position: relative;
+}
+
+.svgIcon {
+    width: 1vw;
+    transition-duration: .3s;
+}
+
+.svgIcon path {
+    fill: white;
+}
+
+.delete-button:hover {
+    width: 8vw;
+    border-radius: 2vw;
+    transition-duration: .3s;
+    background-color: rgb(255, 69, 69);
+    align-items: center;
+}
+
+.delete-button:hover .svgIcon {
+    width: 3vw;
+    transition-duration: .3s;
+    transform: translateY(60%);
+}
+
+.delete-button::before {
+    position: absolute;
+    top: -2.5vw;
+    content: "Delete";
+    color: white;
+    transition-duration: .3s;
+    font-size: .5vw;
+}
+
+.delete-button:hover::before {
+    font-size: 1vw;
+    opacity: 1;
+    transform: translateY(3vw);
+    transition-duration: .3s;
+}
+
+/*******************************************************/
+.product-button {
+    width: 3vw;
+    height: 3vw;
+    border-radius: 50%;
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition-duration: .3s;
+    overflow: hidden;
+    position: relative;
+}
+
+.product-svg {
+    width: 1.5vw;
+    transition-duration: .3s;
+}
+
+.product-button svg  path {
+    fill: white;
+}
+
+.product-button:hover {
+    width: 8vw;
+    border-radius: 2vw;
+    transition-duration: .3s;
+    align-items: center;
+}
+
+.product-button:hover .product-svg {
+    width: 1.5vw;
+    transition-duration: .3s;
+    transform: translateX(150%);
+}
+
+#cart-button::before {
+    position: absolute;
+    left: -4vw;
+    color: white;
+    transition-duration: .3s;
+    font-size: 1vw;
+    content: "Guardar";
+}
+
+#edit-button::before {
+    position: absolute;
+    left: -3vw;
+    color: white;
+    transition-duration: .3s;
+    font-size: 1vw;
+    content: "Editar";
+}
+
+.product-button:hover::before {
+    font-size: 1vw;
+    opacity: 1;
+    transition-duration: .3s;
+}
+
+#cart-button:hover::before{
+    transform: translateX(125%);
+}
+
+#edit-button:hover::before{
+    transform: translateX(155%);
+}
+
+#cart-button{
+    background-color: #73b1c9;
+}
+
+#cart-button:hover{
+    background-color: rgb(0, 184, 255);
+}
+
+#edit-button{
+    background-color: #e5af6a;
+}
+
+#edit-button:hover{
+    background-color: rgb(255, 119, 10);
+}
+
+
+/********************************** COMMENTS SECTION *******************************************/
+.comments-container{
+    border: .1vw solid grey;
+    border-radius: 2vw;
+    padding: 2vw 2vw 2vw 2vw;
+    box-shadow: .5vw 1vw 2vw #111111;
+    width: 80%;
+    margin: 0 auto;
+    margin-top: 4vw;
+    font-family: Arial;
+}
+
+.comments-title{
+    display: flex;
+    gap: 1vw;
+}
+
+.comments-title h3{
+    margin-top: 0;
+    font-size: 2vw;
+    gap: 1vw;
+}
+
+.comments-title svg{
+    width: 2.5vw;
+    height: 2.5vw;
+}
+
+
+
+/******************************************************************************/
+.button {
+    appaerance: none;
+    font: inherit;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.new-comment {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    font-family: Arial;
+    margin-bottom: 4vw;
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: #fff;
+    box-shadow: 0 .5vw 2vw 0 rgba(142, 205, 238, 0.5);
+    border-radius: 1vw;
+}
+
+.modal__header {
+    padding: 1vw 1.5vw;
+    border-bottom: .1vw solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal__body {
+    padding: 1vw 1vw;
+}
+
+.modal__body p{
+    color: red;
+}
+
+.modal__footer {
+    padding: 0 1.5vw 1.5vw;
+}
+
+.modal__title {
+    font-weight: 700;
+    font-size: 1.25vw;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.15s ease;
+}
+
+.button--icon {
+    width: 2.5vw;
+    height: 2.5vw;
+    background-color: transparent;
+    border-radius: 0.25vw;
+}
+
+.button--icon:focus, .button--icon:hover {
+    background-color: #ededed;
+}
+
+.button--primary {
+    background-color: #007dab;
+    color: #FFF;
+    padding: 0.75vw 1.25vw;
+    border-radius: 0.25vw;
+    font-weight: 500;
+    font-size: 0.875vw;
+}
+
+.button--primary:hover {
+    background-color: #006489;
+}
+
+.input {
+    display: flex;
+    flex-direction: column;
+}
+
+.input + .input {
+    margin-top: 1.75vw;
+}
+
+.input__label {
+    font-weight: 700;
+    font-size: 0.875vw;
+}
+
+.input__field {
+    display: block;
+    margin-top: 0.5vw;
+    border: .1vw solid #DDD;
+    border-radius: 0.25vw;
+    padding: 0.75vw 0.75vw;
+    transition: 0.15s ease;
+}
+
+.input__field:focus {
+    outline: none;
+    border-color: #007dab;
+    box-shadow: 0 0 0 .05vw #007dab, 0 0 0 4px rgba(0, 125, 171, 0.25);
+}
+
+.input__field--textarea {
+    min-height: 10vw;
+    max-width: 100%;
+    font-family: Arial;
+}
+
+.input__description {
+    font-size: 0.875vw;
+    margin-top: 0.5vw;
+    color: #8d8d8d;
+}
+
+/**************************************************************************/
+.comment{
+    border: .05vw solid grey;
+    border-radius: 1.2vw;
+    width: auto;
+    padding: 1vw 1vw 1vw 1vw;
+}
+
+.essentials{
+    display: flex;
+    font-family: Arial;
+    align-items: center;
+    gap: 1vw;
+}
+
+.essentials-form-container{
+    display: flex;
+    align-items: center;
+}
+
+.score-container{
+    width: 3.3vw;
+    height: 3.3vw;
+    border-radius: 1vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.score-container h5{
+    margin: 0;
+    font-size: 1.5vw;
+}
+
+.unserName-container h5{
+    margin: 0;
+    font-size: 1.2vw;
+}
+
+.text{
+    font-size: 1vw;
+    margin-left: .7vw;
+    margin-top: 1vw;
+    width: auto;
+    word-wrap: break-word;
+}
+
+.text p{
+    margin: 0;
+    width: auto;
+}
+
+/*************************************************************************/
+.bin-button {
+    width: 2.2vw;
+    height: 2.2vw;
+    border-radius: 50%;
+    background-color: rgb(20, 20, 20);
+    border: none;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px .2vw rgba(0, 0, 0, 0.164);
+    cursor: pointer;
+    transition-duration: 0.3s;
+    overflow: hidden;
+    position: relative;
+    gap: .1vw;
+}
+
+.bin-button .svgIcon {
+    width: .7vw;
+    transition-duration: 0.3s;
+}
+
+.bin-button .svgIcon path {
+    fill: white;
+}
+
+.bin-button:hover {
+    transition-duration: 0.3s;
+    background-color: rgb(255, 69, 69);
+    align-items: center;
+    gap: 0;
+}
+
+.bin-button .bin-top {
+    transform-origin: bottom right;
+}
+.bin-button:hover .bin-top {
+    transition-duration: 0.5s;
+    transform: rotate(160deg);
+}
+
+#clip0_35_24 rect{
+    fill: white;
+    height: 1vw;
+    width: 6.9vw;
+}
+
+#clip0_35_22 rect{
+    fill: white;
+    height: 5.7vw;
+    width: 6.9vw;
+}
+
+
+
+
+
+
+
+
+
+
+
+
