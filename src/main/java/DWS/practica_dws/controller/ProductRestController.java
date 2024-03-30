@@ -31,12 +31,30 @@ public class ProductRestController {
     private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
     @GetMapping("/products")
-    public ResponseEntity<Collection<Product>> showAllProducts(@RequestParam(required = false) String search){
+    public ResponseEntity<Collection<Product>> showAllProducts(@RequestParam(required = false) String name){
         Collection<Product> list;
-        if(search==null) {
+        if(name==null) {
             list = this.productsService.getAll();
         }else {
-            list = productsService.getProductsByName(search);
+            list = productsService.getProductsByName(name);
+        }
+        if(list != null){
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/products/filter")
+    public ResponseEntity<Collection<Product>> showFilterProducts(@RequestParam(required = false) Double min,
+                                                                  @RequestParam(required = false) Double max, @RequestParam(required = false) String type){
+        Collection<Product> list;
+        if(max==null && min==null && (type==null || type.isEmpty())) {
+            list = this.productsService.getAll();
+        }else if(this.productsService.correctFilter(min, max)){
+            list = this.productsService.getAll(min, max, type);
+        }else{
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if(list != null){
             return new ResponseEntity<>(list, HttpStatus.OK);
@@ -70,7 +88,7 @@ public class ProductRestController {
     @PutMapping("/products/{id}")
     public ResponseEntity editProduct(@RequestBody Product product, @PathVariable long id){
         Optional <Product> oldProduct;
-        if(product.getName()!=null || product.getPrice()>0 || product.getDescription()!=null){
+        if(productsService.comprobationProductIsNotEmpty(product)){
             oldProduct=productsService.getProduct(id);
             if(!oldProduct.isPresent()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

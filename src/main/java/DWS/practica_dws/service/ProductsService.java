@@ -150,4 +150,12 @@ public class ProductsService {
     private boolean isNotEmptyField(String field) {
         return field != null && !field.isEmpty();
     }
+
+    public boolean comprobationProductIsNotEmpty(Product product){
+        if(product.getName()!=null || product.getPrice()>0 || product.getDescription()!=null){
+            return true;
+        }
+        return false;
+    }
+
 }
