@@ -21,6 +21,9 @@ public class Comment {
         this.opinion = opinion;
     }
 
+    public long getCID() {
+        return CID;
+    }
 
     public String getUserName() {
         return userName;

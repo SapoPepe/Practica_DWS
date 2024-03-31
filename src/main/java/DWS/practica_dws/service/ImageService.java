@@ -1,32 +1,20 @@
 package DWS.practica_dws.service;
 
-import DWS.practica_dws.model.Image;
 import DWS.practica_dws.model.Product;
-import DWS.practica_dws.repository.ProductRepository;
-import jakarta.persistence.EntityManager;
 import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.Base64;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
@@ -95,12 +83,6 @@ public class ImageService {
         return Files.exists(imagePath);
 	}*/
 
-	public void saveImage(Product p, Image image) throws IOException {
-		URI location = this.createFilePath(p.getId());
-		p.setImageLocation(location.toString());
-		p.setImageFile(BlobProxy.generateProxy(Base64.getDecoder().decode(image.getImageBase64())));
-		this.products.saveProduct(p);
-	}
 
 	public boolean hasImage(MultipartFile image){
 		return image!=null && !image.isEmpty();

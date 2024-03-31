@@ -39,8 +39,7 @@ public class ProductController {
     @Autowired
     private FileService fileService;
 
-    private static final String PRODUCTS_FOLDER = "products";
-    private ImageService imageService = new ImageService();
+     private ImageService imageService = new ImageService();
 
     @GetMapping("/")
     public String showProducts(Model model, HttpSession httpSession, @RequestParam(required = false) Double min,
@@ -87,7 +86,7 @@ public class ProductController {
                 if(this.imageService.hasImage(image)) this.imageService.saveImage(p, image);
 
                 //If it has a PDF file, it will be save in memory and the product will have the name of it's file
-                if(this.fileService.hasFile(file)) this.fileService.saveFile(PRODUCTS_FOLDER, p, file);
+                if(this.fileService.hasFile(file)) this.fileService.saveFile(p, file);
 
                 this.productsService.saveProduct(p);
                 model.addAttribute("name", name);
@@ -114,7 +113,7 @@ public class ProductController {
 
     @GetMapping("/product/{id}/file")
     public ResponseEntity<Object> downloadFile(@PathVariable long id) throws MalformedURLException{
-        return fileService.createResponseFromImage(PRODUCTS_FOLDER, id);
+        return fileService.createResponseFromImage(id);
     }
 
 
@@ -140,7 +139,7 @@ public class ProductController {
             Product p = aux.get();
             //We first delete the image from the DB and then the product entity
             this.imageService.deleteImage(p);
-            this.fileService.deleteFile(PRODUCTS_FOLDER, p.getId());
+            this.fileService.deleteFile(p.getId());
             this.productsService.saveProduct(p);
             this.productsService.deleteProduct(id, this.personSession);
             model.addAttribute("product", p.getName());
@@ -175,8 +174,8 @@ public class ProductController {
 
         //For the file
         if(file!=null && !file.isEmpty() && this.fileService.admitedFile(file)){
-            if(p.hasFile()) this.fileService.deleteFile(PRODUCTS_FOLDER, p.getId());    //Delete the old file
-            this.fileService.saveFile(PRODUCTS_FOLDER, p, file);        //Keep the new file
+            if(p.hasFile()) this.fileService.deleteFile(p.getId());    //Delete the old file
+            this.fileService.saveFile(p, file);                        //Keep the new file
         }
 
         this.productsService.saveProduct(p);

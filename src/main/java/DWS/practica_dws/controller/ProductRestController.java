@@ -2,8 +2,9 @@ package DWS.practica_dws.controller;
 
 import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.CustomError;
-import DWS.practica_dws.model.Image;
+//import DWS.practica_dws.model.Image;
 import DWS.practica_dws.model.Product;
+import DWS.practica_dws.service.FileService;
 import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.PersonSession;
 import DWS.practica_dws.service.ProductsService;
@@ -11,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Blob;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -27,40 +28,40 @@ public class ProductRestController {
     private PersonSession userSession;
     @Autowired
     private ImageService imageService;
+    @Autowired
+    private FileService fileService;
 
     private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
     @GetMapping("/products")
-    public ResponseEntity<Collection<Product>> showAllProducts(@RequestParam(required = false) String name){
+    public ResponseEntity<Collection<Product>> showAllProducts(@RequestParam(required = false) String name, @RequestParam(required = false) Double min,
+                                                               @RequestParam(required = false) Double max, @RequestParam(required = false) String type){
         Collection<Product> list;
         if(name==null) {
-            list = this.productsService.getAll();
+            if(max==null && min==null && (type==null || type.isEmpty())) {
+                list = this.productsService.getAll();
+            }else if(this.productsService.correctFilter(min, max)){
+                list = this.productsService.getAll(min, max, type);
+            }else{
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         }else {
-            list = productsService.getProductsByName(name);
+            if(max==null && min==null && (type==null || type.isEmpty())) {
+                list = productsService.getProductsByName(name);
+            }else if(this.productsService.correctFilter(min, max)){
+                list = productsService.getProductByNameWithFilter(name, min, max, type);
+            }else{
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         }
         if(list != null){
             return new ResponseEntity<>(list, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
 
-    @GetMapping("/products/filter")
-    public ResponseEntity<Collection<Product>> showFilterProducts(@RequestParam(required = false) Double min,
-                                                                  @RequestParam(required = false) Double max, @RequestParam(required = false) String type){
-        Collection<Product> list;
-        if(max==null && min==null && (type==null || type.isEmpty())) {
-            list = this.productsService.getAll();
-        }else if(this.productsService.correctFilter(min, max)){
-            list = this.productsService.getAll(min, max, type);
-        }else{
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(list != null){
-            return new ResponseEntity<>(list, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
+
     }
 
     @PostMapping("/products")
@@ -151,6 +152,7 @@ public class ProductRestController {
         //If the product exist and the comment is well-formed, it's add to the product
         if(product.isPresent() && this.productsService.correctComment(comment.getUserName(), comment.getScore())){
             product.get().addComment(comment);
+            productsService.saveProduct(product.get());
             userSession.getUser().addComment(comment);
             return new ResponseEntity<>(comment, HttpStatus.OK);
         } else {
@@ -161,20 +163,22 @@ public class ProductRestController {
 
 
     @DeleteMapping("/products/{id}/comments/{CID}")
-    public ResponseEntity deleteComment(@PathVariable long id, @PathVariable int CID){
+    public ResponseEntity deleteComment(@PathVariable long id, @PathVariable long CID){
         if(!productsService.getProduct(id).isPresent()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        productsService.deleteCommentFromProduct(id, CID);
+        productsService.deleteCommentFromProduct(CID, id);
+        this.userSession.deleteComment(CID);
+        this.productsService.deleteComment(CID);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/products/{id}/image")
-    public ResponseEntity addImage(@RequestBody Image image, @PathVariable long id){
+    public ResponseEntity addImage(@RequestBody MultipartFile image, @PathVariable long id){
         Optional <Product> p;
         try {
              p = productsService.getProduct(id);
-             if(p.isPresent()){
+             if(p.isPresent() && imageService.hasImage(image) && imageService.admitedImage(image)){
                  imageService.saveImage(p.get(), image);
                  productsService.saveProduct(p.get());
                  return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -189,17 +193,9 @@ public class ProductRestController {
     @GetMapping("/products/{id}/image")
     public ResponseEntity getImage(@PathVariable long id){
         Optional <Product> p;
-        Image image = new Image();
         try {
             p = productsService.getProduct(id);
-            if(p.isPresent()){
-                Blob blob = p.get().getImageFile();
-                byte[] bytes = blob.getBytes(0,(int)blob.length());
-                image.setImageBase64(Base64.getEncoder().encodeToString(bytes));
-                return new ResponseEntity<>(image, HttpStatus.OK);
-            }else{
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return this.imageService.getImage(p.get());
         }catch (Exception exception){
             return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -223,12 +219,69 @@ public class ProductRestController {
     }
 
     @PutMapping("/products/{id}/image")
-    public ResponseEntity editImage(@PathVariable long id, @RequestBody Image image){
+    public ResponseEntity editImage(@PathVariable long id, @RequestBody MultipartFile image){
         Optional <Product> p;
         try {
             p = productsService.getProduct(id);
-            if(p.isPresent()){
+            if(p.isPresent() && imageService.hasImage(image) && imageService.admitedImage(image)){
                 imageService.saveImage(p.get(), image);
+                productsService.saveProduct(p.get());
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }else{
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }catch (Exception exception){
+            return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PostMapping("/products/{id}/file")
+    public ResponseEntity addFile(@RequestBody MultipartFile file, @PathVariable long id){
+        Optional <Product> p;
+        try {
+            p = productsService.getProduct(id);
+            if(p.isPresent() && fileService.hasFile(file) && fileService.admitedFile(file)){
+                fileService.saveFile(p.get(), file);
+                productsService.saveProduct(p.get());
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }else{
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }catch (Exception exception){
+            return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/products/{id}/file")
+    public ResponseEntity getFile(@PathVariable long id){
+        try {
+            return fileService.createResponseFromImage(id);
+        }catch (Exception exception){
+            return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/products/{id}/file")
+    public ResponseEntity deleteFile(@PathVariable long id){
+        try{
+            fileService.deleteFile(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (Exception exception){
+            return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/products/{id}/file")
+    public ResponseEntity modifyFile(@RequestBody MultipartFile file, @PathVariable long id){
+        Optional <Product> p;
+        try {
+            p = productsService.getProduct(id);
+            if(p.isPresent() && fileService.hasFile(file) && fileService.admitedFile(file)){
+                if(p.get().hasFile()){
+                    this.fileService.deleteFile(p.get().getId());    //Delete the old file
+                }
+                fileService.saveFile(p.get(), file);
                 productsService.saveProduct(p.get());
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }else{

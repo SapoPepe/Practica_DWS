@@ -95,8 +95,16 @@ public class Product {
         this.comments.clear();
     }
 
+    @JsonIgnore
     public Blob getImageFile(){
         return this.image;
+    }
+
+    public String getHrefImg(){
+        if(image!=null){
+            return "/api/products/" + id + "/image";
+        }
+        return null;
     }
 
     public String getType(){
