@@ -20,7 +20,7 @@ public class Product {
     private String type;
     private String fileName;
     private boolean containsFile;
-    @Lob
+    @Column(length = 50000)
     private String description;
     //If the Product is being deleted, all their comments are deleted too
     @OneToMany(cascade = CascadeType.ALL)
