@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.Normalizer;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 public class ProductsService {
@@ -28,13 +30,13 @@ public class ProductsService {
 
 
     @PostConstruct
-    public void init(){
+    public void init() {
         Product p1 = new Product("Acetie homeopático", "Para cuando la vida te da limones, ¡tú le das CBD!  Un toque de tranquilidad para esos días estresantes. Relájate, respira profundo y disfruta de la vibra natural. ¡Dile adiós al estrés y hola a la buena energía!", 18.90, "Farmacia", null);
         Product p2 = new Product("Botellín de cerveza", "¿Cansado de la misma rutina? ¡Relájate con la nueva Cerveza CBD! Suave, refrescante y con un toque especial que te hará sentir zen. Olvídate del estrés y disfruta de una experiencia única. ¡Salud!", 2.15, "Comida", null);
-        Product p3 = new Product("Crema de manos", "¿Manos secas y estresadas? ¡Dile adiós a la piel áspera con nuestra crema de manos con CBD! Enriquecida con aceite de cáñamo, esta crema mágica te dará la hidratación que necesitas para unas manos suaves como la seda. Además, su efecto relajante te ayudará a desestresarte después de un largo día. ¡Olvídate de las preocupaciones y disfruta de unas manos sanas y felices!", 24.1, "Farmacia", null);
-        Product p4 = new Product("Aspirina 500mg", "Dile adiós al dolor con un toque de paz interior. Prueba nuestra nueva aspirina con CBD, la combinación perfecta para calmar tu cuerpo y tu mente. Te sentirás tan bien que hasta las migrañas se irán de fiesta. ¡Es hora de darle un respiro a tu cabeza!", 10.32, "Farmacia", null);
-        Product p5 = new Product("Galletas con chocolate", "Olvídate del estrés, ¡dile hola a las galletas CBD!  Un dulce viaje a la relajación sin psicoactividad. Disfruta de un sabor delicioso y un efecto calmante que te hará sentir como flotando en una nube. ¡Perfectas para después de un largo día o para una tarde de Netflix!", 7, "Comida", null);
-        Product p6 = new Product("Gominolas", "¿Cansado del estrés? ¿Abrumado por la rutina? ¡No te preocupes! Prueba nuestras deliciosas gominolas con CBD, ¡el remedio natural para un día más zen! Con un toque de sabor a frutas tropicales y una dosis perfecta de CBD, estas gomitas te ayudarán a relajarte, mejorar tu sueño y encontrar la paz interior. Olvídate de las pastillas y las infusiones, ¡disfruta de los beneficios del CBD de la forma más divertida y deliciosa! Pide ya tus gominolas CBD y descubre una nueva forma de bienestar.", 13.33, "Comida", null);
+        Product p3 = new Product("Crema de manos", "¿Manos secas y estresadas? ¡Dile adiós a la piel áspera con nuestra crema de manos con CBD! Enriquecida con aceite de cáñamo, esta crema mágica te dará la hidratación que necesitas para unas manos suaves como la seda.", 24.1, "Farmacia", null);
+        Product p4 = new Product("Aspirina 500mg", "Dile adiós al dolor con un toque de paz interior. Prueba nuestra nueva aspirina con CBD, la combinación perfecta para calmar tu cuerpo y tu mente. Te sentirás tan bien que hasta las migrañas se irán de fiesta.", 10.32, "Farmacia", null);
+        Product p5 = new Product("Galletas con chocolate", "Olvídate del estrés, ¡dile hola a las galletas CBD!  Un dulce viaje a la relajación sin psicoactividad. Disfruta de un sabor delicioso y un efecto calmante que te hará sentir como flotando en una nube.", 7, "Comida", null);
+        Product p6 = new Product("Gominolas", "¿Cansado del estrés? Prueba nuestras deliciosas gominolas con CBD, con un toque de sabor a frutas tropicales y una dosis perfecta de CBD, estas gomitas te ayudarán a relajarte, mejorar tu sueño y encontrar la paz interior.", 13.33, "Comida", null);
         p1.setPhoto(true);
         p2.setPhoto(true);
         p3.setPhoto(true);
@@ -50,26 +52,31 @@ public class ProductsService {
 
     }
 
-    public void saveProduct(Product p){
+    public void saveProduct(Product p) {
+        if(p.getComments()!=null){
+            for (Comment comment : p.getComments()) {
+                comment.setOpinion(stripXSS(comment.getOpinion()));
+            }
+        }
         this.products.saveAndFlush(p);
     }
 
-    public Collection<Product> getAll(){
+    public Collection<Product> getAll() {
         return this.products.findAll();
     }
 
-    public List<Product> getAll(Double min, Double max, String type){
+    public List<Product> getAll(Double min, Double max, String type) {
         return this.products.findByPriceRangeAndType(min, max, type);
     }
 
-    public Optional<Product> getProduct(Long id){
+    public Optional<Product> getProduct(Long id) {
         return this.products.findById(id);
     }
 
-    public Product deleteProduct(long id, PersonSession session){
+    public Product deleteProduct(long id, PersonSession session) {
         Optional<Product> aux = this.products.findById(id);
         //If aux contains something we remove it from the DB
-        if(aux.isPresent()){
+        if (aux.isPresent()) {
             Product p = aux.get();
             session.deleteProductFromCarts(p);
             //We need to delete the comments form this product in middle table that associate users with comments because if not it jump off an error
@@ -83,27 +90,28 @@ public class ProductsService {
         return null;
     }
 
-    public void saveComment(Comment c){
+    public void saveComment(Comment c) {
+        c.setOpinion(stripXSS(c.getOpinion()));
         this.comments.saveAndFlush(c);
     }
 
-    public void deleteComment(long CID){
+    public void deleteComment(long CID) {
         this.comments.deleteById(CID);
     }
 
-    public void deleteCommentFromProduct(long CID, long id){
+    public void deleteCommentFromProduct(long CID, long id) {
         Product p = this.products.findById(id).orElseThrow();
         Comment c = this.comments.findById(CID).orElseThrow();
         p.removeComment(c);
     }
 
-    public Comment getComment(long CID){
+    public Comment getComment(long CID) {
         return this.comments.findById(CID).orElseThrow();
     }
 
     public void removeProductFromCart(long id, PersonSession userSession) {
         Optional<Product> productToRemove = this.products.findById(id);
-        if(productToRemove.isPresent()){
+        if (productToRemove.isPresent()) {
             userSession.unfollow(id);
         }
     }
@@ -112,35 +120,35 @@ public class ProductsService {
         return this.products.findProductByName(productName);
     }
 
-    public List<Product> getProductByNameWithFilter(String productName, Double min, Double max, String type){
+    public List<Product> getProductByNameWithFilter(String productName, Double min, Double max, String type) {
         return this.products.findProductByNameWithFilter(productName, min, max, type);
     }
 
-    public Collection<Product> availableProducts(Collection<Product> cartProducts){
+    public Collection<Product> availableProducts(Collection<Product> cartProducts) {
         List<Product> aux = new ArrayList<>();
-        for (Product p : cartProducts){
-            if(this.products.findById(p.getId()).isPresent()) aux.add(p);
+        for (Product p : cartProducts) {
+            if (this.products.findById(p.getId()).isPresent()) aux.add(p);
         }
         return aux;
     }
 
-    public boolean hasPrincipals(String name, double price){
-        return name!=null && !name.isEmpty() && price>0;
+    public boolean hasPrincipals(String name, double price) {
+        return name != null && !name.isEmpty() && price > 0;
     }
 
-    public boolean hasDescription(String description){
-        return description!=null && !description.isEmpty();
+    public boolean hasDescription(String description) {
+        return description != null && !description.isEmpty();
     }
 
 
-    public boolean correctComment(String name, Integer score){
-        return name!=null && !name.isEmpty() && score!=null && !score.describeConstable().isEmpty() && score.intValue()>=0 && score.intValue()<=10;
+    public boolean correctComment(String name, Integer score) {
+        return name != null && !name.isEmpty() && score != null && !score.describeConstable().isEmpty() && score.intValue() >= 0 && score.intValue() <= 10;
     }
 
-    public boolean correctFilter(Double min, Double max){
-        if(min!=null && max==null) return min>=0;
-        if(min==null && max!=null) return max>=0;
-        if(min!=null && max!=null) return min <= max && min >= 0 && max >= 0;
+    public boolean correctFilter(Double min, Double max) {
+        if (min != null && max == null) return min >= 0;
+        if (min == null && max != null) return max >= 0;
+        if (min != null && max != null) return min <= max && min >= 0 && max >= 0;
         return true;
     }
 
@@ -148,11 +156,33 @@ public class ProductsService {
         return field != null && !field.isEmpty();
     }
 
-    public boolean comprobationProductIsNotEmpty(Product product){
-        if(product.getName()!=null || product.getPrice()>0 || product.getDescription()!=null){
+    public boolean comprobationProductIsNotEmpty(Product product) {
+        if (product.getName() != null || product.getPrice() > 0 || product.getDescription() != null) {
             return true;
         }
         return false;
+    }
+
+
+    private String stripXSS(String value) {
+        String cleanValue = null;
+        Pattern scriptPattern = null;
+        String [] patterns = {"<script>(.*?)</script>", "src[\r\n]*=[\r\n]*\\\'(.*?)\\\'", "src[\r\n]*=[\r\n]*\\\"(.*?)\\\"", "</script>", "<script(.*?)>",
+                "eval\\((.*?)\\)", "expression\\((.*?)\\)", "javascript:", "vbscript:", "onload(.*?)=", "&lt;script&gt;(.*?)&lt;/script&gt;", "&lt;/script&gt;",
+                "&lt;script(.*?)&gt;", "<img>(.*?)</img>", "</img>", "<img(.*?)>", "&lt;img&gt;(.*?)&lt;/img&gt;", "&lt;/img&gt;", "&lt;img(.*?)&gt;", "CDATA",
+                "</object>","<object(.*?)>"};
+        if (value != null) {
+            cleanValue = Normalizer.normalize(value, Normalizer.Form.NFD);
+
+            // Avoid null characters
+            cleanValue = cleanValue.replaceAll("\0", "");
+
+            for(String patt:patterns){
+                scriptPattern = Pattern.compile(patt, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+                cleanValue = scriptPattern.matcher(cleanValue).replaceAll("");
+            }
+        }
+        return cleanValue;
     }
 
 }
