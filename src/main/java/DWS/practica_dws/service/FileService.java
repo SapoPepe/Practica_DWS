@@ -19,21 +19,20 @@ import java.nio.file.Paths;
 public class FileService {
     @Autowired
     private ProductsService productsService;
-    private long counter = 0;
+    //private long counter = 0;
 
     private static final Path FILES_FOLDER = Paths.get(System.getProperty("user.dir"), "files");
     private static final String PRODUCTS_FOLDER = "products";
 
 
-    private Path createFilePath(String fileName, Path folder, long id) {
-        //this.counter++;
-        return folder.resolve("("+ id + ")-product-" + fileName);
+    private Path createFilePath(String fileName, Path folder) {
+        return folder.resolve(fileName);
     }
 
     public void saveFile(Product p, MultipartFile file) throws IOException {
         Path folder = FILES_FOLDER.resolve(PRODUCTS_FOLDER);
         Files.createDirectories(folder);
-        Path newFile = createFilePath(file.getOriginalFilename(), folder, p.getId());
+        Path newFile = createFilePath(file.getOriginalFilename(), folder);
         file.transferTo(newFile);
 
         p.setFile(true, file.getOriginalFilename());
@@ -43,7 +42,7 @@ public class FileService {
         Path folder = FILES_FOLDER.resolve(PRODUCTS_FOLDER);
         Product p = this.productsService.getProduct(productID).orElseThrow();
 
-        Path filePath = createFilePath(p.getFileName(), folder, productID);
+        Path filePath = createFilePath(p.getFileName(), folder);
 
         Resource file = new UrlResource(filePath.toUri());
 
@@ -57,7 +56,7 @@ public class FileService {
     public void deleteFile(long productID) throws IOException {
         Path folder = FILES_FOLDER.resolve(PRODUCTS_FOLDER);
         Product p = this.productsService.getProduct(productID).orElseThrow();
-        Path imageFile = createFilePath(p.getFileName(), folder, productID);
+        Path imageFile = createFilePath(p.getFileName(), folder);
         Files.deleteIfExists(imageFile);
         p.setFile(false, null);
         this.productsService.saveProduct(p);

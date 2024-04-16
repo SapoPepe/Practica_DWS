@@ -5,8 +5,12 @@ import DWS.practica_dws.model.Person;
 import DWS.practica_dws.model.Product;
 import DWS.practica_dws.repository.CommentRepository;
 import DWS.practica_dws.repository.ProductRepository;
+import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
+import org.owasp.esapi.ESAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -164,7 +168,7 @@ public class ProductsService {
     }
 
 
-    private String stripXSS(String value) {
+    /*private String stripXSS(String value) {
         String cleanValue = null;
         Pattern scriptPattern = null;
         String [] patterns = {"<script>(.*?)</script>", "src[\r\n]*=[\r\n]*\\\'(.*?)\\\'", "src[\r\n]*=[\r\n]*\\\"(.*?)\\\"", "</script>", "<script(.*?)>",
@@ -183,6 +187,32 @@ public class ProductsService {
             }
         }
         return cleanValue;
+    }*/
+    public static String stripXSS( String value ) {
+        //This safelist allows only simple text formatting: b, em, i, strong, u. All other HTML (tags and attributes) will be removed.
+        Safelist safeList=Safelist.simpleText();
+
+        if(StringUtils.isBlank(value))
+            return value;
+
+        safeList.addTags("p");
+        safeList.addTags("h1");
+        safeList.addTags("h2");
+        safeList.addTags("h3");
+        safeList.addTags("ol");
+        safeList.addTags("li");
+        safeList.addTags("ul");
+        safeList.addTags("br");
+
+        // Use the ESAPI library to avoid encoded attacks.
+        value = ESAPI.encoder().canonicalize( value );
+
+        // Avoid null characters
+        value = value.replaceAll("\0", "");
+
+        value = Jsoup.clean( value,  safeList );
+
+        return value;
     }
 
 }
