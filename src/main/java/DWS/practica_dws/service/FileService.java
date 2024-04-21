@@ -25,14 +25,14 @@ public class FileService {
     private static final String PRODUCTS_FOLDER = "products";
 
 
-    private Path createFilePath(String fileName, Path folder) {
-        return folder.resolve(fileName);
+    private Path createFilePath(String fileName, Path folder,long pId) {
+        return folder.resolve(String.valueOf(pId)).resolve(fileName);
     }
 
     public void saveFile(Product p, MultipartFile file) throws IOException {
         Path folder = FILES_FOLDER.resolve(PRODUCTS_FOLDER);
-        Files.createDirectories(folder);
-        Path newFile = createFilePath(file.getOriginalFilename(), folder);
+        Files.createDirectories(folder.resolve(String.valueOf(p.getId())));
+        Path newFile = createFilePath(file.getOriginalFilename(),folder,p.getId());
         file.transferTo(newFile);
 
         p.setFile(true, file.getOriginalFilename());
@@ -42,7 +42,7 @@ public class FileService {
         Path folder = FILES_FOLDER.resolve(PRODUCTS_FOLDER);
         Product p = this.productsService.getProduct(productID).orElseThrow();
 
-        Path filePath = createFilePath(p.getFileName(), folder);
+        Path filePath = createFilePath(p.getFileName(),folder,productID);
 
         Resource file = new UrlResource(filePath.toUri());
 
@@ -56,7 +56,7 @@ public class FileService {
     public void deleteFile(long productID) throws IOException {
         Path folder = FILES_FOLDER.resolve(PRODUCTS_FOLDER);
         Product p = this.productsService.getProduct(productID).orElseThrow();
-        Path imageFile = createFilePath(p.getFileName(), folder);
+        Path imageFile = createFilePath(p.getFileName(),folder,productID);
         Files.deleteIfExists(imageFile);
         p.setFile(false, null);
         this.productsService.saveProduct(p);
@@ -64,7 +64,7 @@ public class FileService {
 
     public boolean admitedFile(MultipartFile file){
         String originalName = file.getOriginalFilename();
-        if(file!=null && !file.isEmpty() && !originalName.matches(".*\\.(pdf)")) return false;
+        if(file!=null && !file.isEmpty() && (!originalName.matches(".*\\.(pdf)")|| originalName.contains(".php") ||originalName.contains(".jar")||originalName.contains(".sh"))) return false;
         return true;
     }
 
