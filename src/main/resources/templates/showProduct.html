@@ -39,6 +39,7 @@
         </form>
     </div>
     <div class="top-bar-buttons-container">
+        {{#admin}}
         <form action="/newProduct" method="get" class="right-bar-button-content">
             <button class="right-bar-button" id="new-product" type="submit">
                 <span>Crear producto</span>
@@ -46,7 +47,7 @@
                     <path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path>            </svg>
             </button>
         </form>
-
+        {{/admin}}
         <form action="/shoppingCart" method="get" class="right-bar-button-content">
             <button class="right-bar-button" id="cart" type="submit">
                 <span>Carrito</span>
@@ -91,6 +92,7 @@
                 </form>
                 {{/product.containsFile}}
 
+                {{#admin}}
                 <form action="/product/{{id}}/edit" method="post">
                     <button class="product-button" id="edit-button" type="submit">
                         <svg xmlns="http://www.w3.org/2000/svg" class="product-svg" viewBox="0 0 16 16"> <path id="pen-path" d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/></svg>
@@ -102,6 +104,7 @@
                         <svg viewBox="0 0 448 512" class="svgIcon"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg>
                     </button>
                 </form>
+                {{/admin}}
             </div>
         </div>
     </div>
@@ -156,6 +159,7 @@
                 <div class="essentials">
                     <div class="score-container"><h5>{{score}}</h5></div>
                     <div class="unserName-container"><h5>{{userName}}</h5></div>
+
                     <div class="essentials-form-container"><form action="/product/{{id}}/comment/{{CID}}" method="post">
                         <button class="bin-button">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 69 14" class="svgIcon bin-top">
@@ -180,6 +184,7 @@
                                 </defs>
                             </svg>
                         </button>
+
                     </form></div>
                 </div>
                 <div class="text">

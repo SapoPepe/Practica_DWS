@@ -17,6 +17,12 @@ public class Person {
     private Long id;
 
     private String personName;
+
+    private String encodedPassword;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles;
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
     @ManyToMany
@@ -25,8 +31,10 @@ public class Person {
     public Person() {
     }
 
-    public Person(String name){
+    public Person(String name, String encodedPassword, String... roles) {
         this.personName = name;
+        this.encodedPassword = encodedPassword;
+        this.roles = List.of(roles);
     }
 
 
@@ -44,7 +52,10 @@ public class Person {
     public void unfollowProduct(Product p){
         for(int i = this.userProducts.size()-1; i >= 0; i--){
             Product aux = this.userProducts.get(i);
-            if(p.equals(aux)) this.userProducts.remove(i);
+            if(p.equals(aux)){
+                this.userProducts.remove(i);
+                break;
+            }
         }
     }
 
@@ -63,7 +74,27 @@ public class Person {
     public void deleteComment(Comment c){
         this.comments.remove(c);
     }
+
+    public boolean hasComment(Comment c){
+        return this.comments.contains(c);
+    }
     public Long getID() {
         return id;
+    }
+
+    public String getEncodedPassword() {
+        return encodedPassword;
+    }
+
+    public void setEncodedPassword(String encodedPassword) {
+        this.encodedPassword = encodedPassword;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 }

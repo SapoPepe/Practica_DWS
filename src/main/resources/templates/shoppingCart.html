@@ -30,6 +30,7 @@
             </form>
         </div>
         <div class="top-bar-buttons-container">
+            {{#admin}}
             <form action="/newProduct" method="get" class="right-bar-button-content">
                 <button class="right-bar-button" id="new-product" type="submit">
                     <span>Crear producto</span>
@@ -37,6 +38,7 @@
                         <path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path>            </svg>
                 </button>
             </form>
+            {{/admin}}
         </div>
     </div>
     <hr>

@@ -25,6 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.security.Principal;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -39,8 +40,27 @@ public class ProductController {
     @Autowired
     private FileService fileService;
 
-    private static final String PRODUCTS_FOLDER = "products";
-    private ImageService imageService = new ImageService();
+     private ImageService imageService = new ImageService();
+
+    @ModelAttribute
+    public void addAttributes(Model model, HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+
+        if(principal != null) {
+
+            //model.addAttribute("logged", true);
+            //model.addAttribute("userName", principal.getName());
+            model.addAttribute("admin", request.isUserInRole("ADMIN"));
+
+        } else {
+            //model.addAttribute("logged", false);
+        }
+    }
+     @GetMapping("/login")
+     public String login(){
+         return "login";
+     }
 
     @GetMapping("/")
     public String showProducts(Model model, HttpSession httpSession, @RequestParam(required = false) Double min,
@@ -57,6 +77,7 @@ public class ProductController {
             model.addAttribute("incorrect_filter", true);
             model.addAttribute("products", this.productsService.getAll());
         }
+
         return "index";
     }
 
@@ -87,7 +108,7 @@ public class ProductController {
                 if(this.imageService.hasImage(image)) this.imageService.saveImage(p, image);
 
                 //If it has a PDF file, it will be save in memory and the product will have the name of it's file
-                if(this.fileService.hasFile(file)) this.fileService.saveFile(PRODUCTS_FOLDER, p, file);
+                if(this.fileService.hasFile(file)) this.fileService.saveFile(p, file);
 
                 this.productsService.saveProduct(p);
                 model.addAttribute("name", name);
@@ -114,7 +135,7 @@ public class ProductController {
 
     @GetMapping("/product/{id}/file")
     public ResponseEntity<Object> downloadFile(@PathVariable long id) throws MalformedURLException{
-        return fileService.createResponseFromFile(PRODUCTS_FOLDER, id);
+        return fileService.createResponseFromImage(id);
     }
 
 
@@ -139,8 +160,8 @@ public class ProductController {
         if(aux.isPresent()){
             Product p = aux.get();
             //We first delete the image from the DB and then the product entity
-            this.imageService.deleteImage(p);
-            this.fileService.deleteFile(PRODUCTS_FOLDER, p.getId());
+            if(p.hasImage()) this.imageService.deleteImage(p);
+            if(p.hasFile()) this.fileService.deleteFile(p.getId());
             this.productsService.saveProduct(p);
             this.productsService.deleteProduct(id, this.personSession);
             model.addAttribute("product", p.getName());
@@ -175,8 +196,8 @@ public class ProductController {
 
         //For the file
         if(file!=null && !file.isEmpty() && this.fileService.admitedFile(file)){
-            if(p.hasFile()) this.fileService.deleteFile(PRODUCTS_FOLDER, p.getId());    //Delete the old file
-            this.fileService.saveFile(PRODUCTS_FOLDER, p, file);        //Keep the new file
+            if(p.hasFile()) this.fileService.deleteFile(p.getId());    //Delete the old file
+            this.fileService.saveFile(p, file);                        //Keep the new file
         }
 
         this.productsService.saveProduct(p);
@@ -185,9 +206,9 @@ public class ProductController {
     }
 
     @PostMapping("/followProduct")
-    public String follow(Model m, @RequestParam String id){
+    public String follow(Model m, @RequestParam String id, HttpServletRequest request){
         long identification = Long.parseLong(id);
-        this.personSession.follow(identification);
+        this.personSession.follow(identification, request.getUserPrincipal());
         this.productsService.getProduct(identification).ifPresent(product -> {
             m.addAttribute("name", product.getName());
         });
@@ -195,29 +216,30 @@ public class ProductController {
     }
 
     @PostMapping("/removeProductFromCart")
-    public String removeProductFromCart(Model model, @RequestParam String id) {
+    public String removeProductFromCart(Model model, @RequestParam String id, HttpServletRequest request) {
         long identification = Long.parseLong(id);
         this.personSession.unfollow(identification);
-        model.addAttribute("products", this.productsService.availableProducts(this.personSession.personProducts()));
+        model.addAttribute("products", this.productsService.availableProducts(this.personSession.personProducts(request.getUserPrincipal())));
         return "shoppingCart";
     }
 
 
     @GetMapping("/shoppingCart")
-    public String userProducts(Model m){
-        m.addAttribute("products", this.productsService.availableProducts(this.personSession.personProducts()));
+    public String userProducts(Model m, HttpServletRequest request){
+        m.addAttribute("products", this.productsService.availableProducts(this.personSession.personProducts(request.getUserPrincipal())));
         return "shoppingCart";
     }
 
 
+
     @PostMapping("/product/{id}/newComment")
-    public String newComment(Model model, @PathVariable long id, @RequestParam(required = false) String userName,
+    public String newComment(Model model, HttpServletRequest request, @PathVariable long id, @RequestParam(required = false) String userName,
                              @RequestParam(required = false) Integer score, @RequestParam(required = false) String opinion){
         Optional<Product> aux = productsService.getProduct(id);
         if(aux.isPresent()){
             Product p = aux.get();
             if(this.productsService.correctComment(userName, score)) {
-                Comment comment = new Comment(userName, score.intValue(), opinion);
+                Comment comment = new Comment(request.getUserPrincipal(), score.intValue(), opinion);
                 p.addComment(comment);
                 this.productsService.saveProduct(p);
                 this.personSession.addComment(comment);
@@ -232,12 +254,13 @@ public class ProductController {
     }
 
     @PostMapping("/product/{id}/comment/{CID}")
-    public String deleteComment(Model model, @PathVariable long id, @PathVariable long CID) {
+    public String deleteComment(Model model, HttpServletRequest request, @PathVariable long id, @PathVariable long CID) {
         Optional<Product> aux = this.productsService.getProduct(id);
 
         if(aux.isPresent()){
             Product p = aux.get();
-            this.productsService.deleteCommentFromProduct(CID, id);
+
+            if(this.personSession.ownsComment(request.getUserPrincipal().getName(), CID)) this.productsService.deleteCommentFromProduct(CID, id);
             this.personSession.deleteComment(CID);
             this.productsService.deleteComment(CID);
             model.addAttribute("product", p);

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -24,16 +25,16 @@ public class PersonSession {
     @Autowired
     private ProductsService productsService;
 
-    @PostConstruct
+    /*@PostConstruct
     public void init(){
         this.person = new Person("Pepe");
         this.persons.save(this.person);
-    }
+    }*/
 
 
-    public void follow(Long identification){
+    public void follow(Long identification, Principal principal){
         Optional<Product> o = this.productsService.getProduct(identification);
-        Person per = this.persons.findById(Long.valueOf(1)).orElseThrow();
+        Person per = this.persons.findByPersonName(principal.getName()).orElseThrow();
 
 
         if(o.isPresent()){
@@ -44,7 +45,6 @@ public class PersonSession {
             this.productsService.saveProduct(p);
         }
     }
-
 
     public void unfollow(Long id){
         Optional<Product> o = this.productsService.getProduct(id);
@@ -60,8 +60,8 @@ public class PersonSession {
         }
     }
 
-    public Collection<Product> personProducts(){
-        Person per = this.persons.findById(Long.valueOf(1)).orElseThrow();
+    public Collection<Product> personProducts(Principal principal){
+        Person per = this.persons.findByPersonName(principal.getName()).orElseThrow();
         return per.cartProducts();
     }
 
@@ -103,5 +103,11 @@ public class PersonSession {
             }
             this.persons.save(per);
         }
+    }
+
+    public boolean ownsComment(String name, long CID){
+        Person p = this.persons.findByPersonName(name).orElseThrow();
+        Comment c = this.productsService.getComment(CID);
+        return p.hasComment(c) && c.hasPerson(name);
     }
 }

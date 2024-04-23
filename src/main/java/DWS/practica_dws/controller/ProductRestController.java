@@ -1,4 +1,4 @@
-package DWS.practica_dws.controller;
+/*package DWS.practica_dws.controller;
 
 import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.CustomError;
@@ -293,3 +293,6 @@ public class ProductRestController {
     }
 
 }
+
+
+ */

@@ -2,6 +2,8 @@ package DWS.practica_dws.model;
 
 import jakarta.persistence.*;
 
+import java.security.Principal;
+
 @Entity
 public class Comment {
     @Id
@@ -15,8 +17,8 @@ public class Comment {
     public Comment() {
     }
 
-    public Comment(String userName, Integer score, String opinion) {
-        this.userName = userName;
+    public Comment(Principal principal, Integer score, String opinion) {
+        this.userName = principal.getName();
         this.score = score;
         this.opinion = opinion;
     }
@@ -47,5 +49,9 @@ public class Comment {
 
     public void setOpinion(String opinion) {
         this.opinion = opinion;
+    }
+
+    public boolean hasPerson(String name){
+        return this.userName.equals(name);
     }
 }
