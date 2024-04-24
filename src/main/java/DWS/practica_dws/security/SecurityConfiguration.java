@@ -53,6 +53,11 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers("/product/{id}/file").permitAll()
                         .requestMatchers("/product/{id}/image").permitAll()
                         .requestMatchers("/searchProduct").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/loginerror").permitAll()
+                        .requestMatchers("/error").permitAll()
+
+
 
 
                         // PRIVATE PAGES
@@ -67,13 +72,11 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers("/product/{id}/edit").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/modify").hasRole("ADMIN")
 
-
-
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
-                        .failureUrl("/loginerror")
                         .defaultSuccessUrl("/")
+                        .failureUrl("/loginerror")
                         .permitAll()
                 )
                 .logout(logout -> logout

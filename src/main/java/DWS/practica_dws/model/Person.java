@@ -63,7 +63,7 @@ public class Person {
         return this.userProducts;
     }
 
-    public List<Comment> getComments() {
+    public List<Comment> etComments() {
         return comments;
     }
 

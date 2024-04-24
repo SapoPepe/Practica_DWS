@@ -188,7 +188,7 @@ public class ProductsService {
         }
         return cleanValue;
     }*/
-    public static String stripXSS( String value ) {
+    public static String stripXSS(String value) {
         //This safelist allows only simple text formatting: b, em, i, strong, u. All other HTML (tags and attributes) will be removed.
         Safelist safeList=Safelist.simpleText();
 

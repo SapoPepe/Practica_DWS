@@ -1,11 +1,12 @@
 package DWS.practica_dws.controller;
 
+
 import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.Product;
 import DWS.practica_dws.service.FileService;
 import DWS.practica_dws.service.ImageService;
-import DWS.practica_dws.service.ProductsService;
 import DWS.practica_dws.service.PersonSession;
+import DWS.practica_dws.service.ProductsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.hibernate.engine.jdbc.BlobProxy;
@@ -49,13 +50,12 @@ public class ProductController {
 
         if(principal != null) {
 
-            //model.addAttribute("logged", true);
-            //model.addAttribute("userName", principal.getName());
+            model.addAttribute("notLogged", false);
+            model.addAttribute("logged", true);
+            model.addAttribute("userName", principal.getName());
             model.addAttribute("admin", request.isUserInRole("ADMIN"));
 
-        } else {
-            //model.addAttribute("logged", false);
-        }
+        } else model.addAttribute("notLogged", true);
     }
      @GetMapping("/login")
      public String login(){
