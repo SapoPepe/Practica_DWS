@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     //Filter products
-    @Query(value = "SELECT * FROM Product WHERE (:min IS NULL OR price >= :min) AND (:max IS NULL OR price <= :max) AND (:type IS NULL OR :type = '' OR type = :type)", nativeQuery = true)
+    @Query("SELECT p FROM Product p WHERE (:min IS NULL OR p.price >= :min) AND (:max IS NULL OR p.price <= :max) AND (:type IS NULL OR :type = '' OR p.type = :type)")
     public List<Product> findByPriceRangeAndType(@Param("min") Double min, @Param("max") Double max, @Param("type") String type);
 
 }

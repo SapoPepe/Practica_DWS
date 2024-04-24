@@ -179,12 +179,11 @@
 
 
         <div style=" display: grid; gap: 2vw">
-            {{#commentList}}
-            <div class="comment" id="comment-{{CID}}">
+            {{#personCommentList}}
+            <div class="comment">
                 <div class="essentials">
                     <div class="score-container"><h5>{{score}}</h5></div>
                     <div class="unserName-container"><h5>{{userName}}</h5></div>
-
                     {{#logged}}
                     <div class="essentials-form-container"><form action="/product/{{id}}/comment/{{CID}}" method="post">
                         <button class="bin-button">
@@ -210,7 +209,6 @@
                                 </defs>
                             </svg>
                         </button>
-
                     </form></div>
                     {{/logged}}
                 </div>
@@ -218,12 +216,25 @@
                     <p>{{{opinion}}}</p>
                 </div>
             </div>
-            {{/commentList}}
-            {{^commentList}}
+            {{/personCommentList}}
+
+            {{#generalCommentList}}
+            <div class="comment">
+                <div class="essentials">
+                    <div class="score-container"><h5>{{score}}</h5></div>
+                    <div class="unserName-container"><h5>{{userName}}</h5></div>
+                </div>
+                <div class="text">
+                    <p>{{{opinion}}}</p>
+                </div>
+            </div>
+            {{/generalCommentList}}
+
+            {{#noComments}}
             <div class="comment">
                 <p>Se el primero en publicar un comentario</p>
             </div>
-            {{/commentList}}
+            {{/noComments}}
             <script src="/js/comment-color.js"></script>
         </div>
     </div>

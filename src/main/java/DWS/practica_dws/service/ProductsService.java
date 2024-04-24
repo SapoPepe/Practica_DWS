@@ -69,7 +69,7 @@ public class ProductsService {
         return this.products.findAll();
     }
 
-    public List<Product> getAll(Double min, Double max, String type) {
+    public Collection<Product> getAll(Double min, Double max, String type) {
         return this.products.findByPriceRangeAndType(min, max, type);
     }
 
@@ -111,6 +111,24 @@ public class ProductsService {
 
     public Comment getComment(long CID) {
         return this.comments.findById(CID).orElseThrow();
+    }
+
+    //It returns a list of two sets, the first one contains the person comments and the second the rest
+    public List<Set<Comment>> commentSeparator(Product p, Person per){
+        List<Comment> aux = p.getComments();
+        Set<Comment> perComments = new HashSet<>();
+        Set<Comment> elseComments = new HashSet<>();
+        List<Set<Comment>> finalList = new ArrayList<>();
+
+        for(Comment c : aux){
+            if(c.hasPerson(per.getName())) perComments.add(c);
+            else elseComments.add(c);
+        }
+
+        finalList.add(perComments);
+        finalList.add(elseComments);
+
+        return finalList;
     }
 
     public void removeProductFromCart(long id, PersonSession userSession) {
@@ -214,5 +232,4 @@ public class ProductsService {
 
         return value;
     }
-
 }

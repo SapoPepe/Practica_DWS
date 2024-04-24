@@ -6,6 +6,7 @@ import DWS.practica_dws.model.Product;
 import DWS.practica_dws.repository.CommentRepository;
 import DWS.practica_dws.repository.PersonRepository;
 import DWS.practica_dws.repository.ProductRepository;
+import DWS.practica_dws.security.SecurityConfiguration;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ public class PersonSession {
     private PersonRepository persons;
     @Autowired
     private ProductsService productsService;
+    @Autowired
+    private SecurityConfiguration securityConfiguration;
 
     /*@PostConstruct
     public void init(){
@@ -65,8 +68,8 @@ public class PersonSession {
         return per.cartProducts();
     }
 
-    public Person getUser(){
-        return this.person;
+    public Person getUser(String userName){
+        return this.persons.findByPersonName(userName).orElseThrow();
     }
 
 
@@ -80,19 +83,24 @@ public class PersonSession {
     }
 
 
-    public void addComment(Comment c){
-        Person per = this.persons.findById(Long.valueOf(1)).orElseThrow();
+    public void addComment(Comment c, String personName){
+        Person per = this.persons.findByPersonName(personName).orElseThrow();
         per.addComment(c);
         this.persons.save(per);
         this.productsService.saveComment(c);
     }
 
-    public void deleteComment(Long CID){
-        Person per = this.persons.findById(Long.valueOf(1)).orElseThrow();
+    public void deleteComment(Long CID, Person per){
         Comment c = this.productsService.getComment(CID);
         per.deleteComment(c);
         this.persons.save(per);
-        this.productsService.deleteComment(CID);
+    }
+
+    public void deleteComment(Long CID){
+        Comment c = this.productsService.getComment(CID);
+        Person per = this.persons.findByPersonName(c.getUserName()).orElseThrow();
+        per.deleteComment(c);
+        this.persons.save(per);
     }
 
     public void deleteCommentsFromUsers(List<Comment> comments){
@@ -109,5 +117,20 @@ public class PersonSession {
         Person p = this.persons.findByPersonName(name).orElseThrow();
         Comment c = this.productsService.getComment(CID);
         return p.hasComment(c) && c.hasPerson(name);
+    }
+
+    public boolean exists(String username){
+        Optional<Person> p = this.persons.findByPersonName(username);
+        return p.isPresent();
+    }
+
+    public void newPerson(String username, String password){
+        this.persons.save(new Person(username, this.securityConfiguration.passwordEncoder().encode(password), "USER"));
+    }
+
+    public boolean isAdmin(Person p){
+        List<String> roles = p.getRoles();
+        for(String s : roles) if(s.equals("ADMIN")) return true;
+        return false;
     }
 }

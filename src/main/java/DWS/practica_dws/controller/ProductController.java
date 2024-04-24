@@ -2,6 +2,7 @@ package DWS.practica_dws.controller;
 
 
 import DWS.practica_dws.model.Comment;
+import DWS.practica_dws.model.Person;
 import DWS.practica_dws.model.Product;
 import DWS.practica_dws.service.FileService;
 import DWS.practica_dws.service.ImageService;
@@ -57,10 +58,7 @@ public class ProductController {
 
         } else model.addAttribute("notLogged", true);
     }
-     @GetMapping("/login")
-     public String login(){
-         return "login";
-     }
+
 
     @GetMapping("/")
     public String showProducts(Model model, HttpSession httpSession, @RequestParam(required = false) Double min,
@@ -72,7 +70,8 @@ public class ProductController {
         }
         else if(this.productsService.correctFilter(min, max)){
             model.addAttribute("incorrect_filter", false);
-            model.addAttribute("products", this.productsService.getAll(min, max, type));
+            Collection<Product> aux = this.productsService.getAll(min, max, type);
+            model.addAttribute("products", aux);
         } else {
             model.addAttribute("incorrect_filter", true);
             model.addAttribute("products", this.productsService.getAll());
@@ -140,13 +139,31 @@ public class ProductController {
 
 
     @GetMapping("/product/{id}")
-    public String showProduct(Model model, @PathVariable Long id) throws MalformedURLException {
+    public String showProduct(Model model, HttpServletRequest request, @PathVariable Long id) {
         Optional<Product> p = productsService.getProduct(id);
         Product product = p.get();
         model.addAttribute("product", product);
-        model.addAttribute("commentList", product.getComments());
+
         if (product.hasImage()) model.addAttribute("containsPhoto", true);
         else model.addAttribute("containsPhoto", false);
+        if(product.getComments().isEmpty()) model.addAttribute("noComments", true);
+
+        //If the user isn't logged he can't see the delete comment button
+        if(request.getUserPrincipal() == null) model.addAttribute("generalCommentList", product.getComments());
+        else{
+            model.addAttribute("logged", true);
+            Person per = this.personSession.getUser(request.getUserPrincipal().getName());
+            //If the user is an ADMIN he can delete any comment
+            if(this.personSession.isAdmin(per)) model.addAttribute("personCommentList", product.getComments());
+            else {
+                List<Set<Comment>> sets = this.productsService.commentSeparator(product, per);
+                Object[] personComments = sets.get(0).toArray();
+                Object[] elseComments = sets.get(1).toArray();
+
+                model.addAttribute("personCommentList", personComments);
+                model.addAttribute("generalCommentList", elseComments);
+            }
+        }
 
         return "showProduct";
     }
@@ -242,15 +259,14 @@ public class ProductController {
                 Comment comment = new Comment(request.getUserPrincipal(), score.intValue(), opinion);
                 p.addComment(comment);
                 this.productsService.saveProduct(p);
-                this.personSession.addComment(comment);
+                this.personSession.addComment(comment, request.getUserPrincipal().getName());
                 model.addAttribute("error", false);
             }
             else model.addAttribute("error", true);
 
             model.addAttribute("product", p);
-            model.addAttribute("commentList", p.getComments());
         }
-        return "showProduct";
+        return showProduct(model, request, id);
     }
 
     @PostMapping("/product/{id}/comment/{CID}")
@@ -259,15 +275,22 @@ public class ProductController {
 
         if(aux.isPresent()){
             Product p = aux.get();
+            Person per = this.personSession.getUser(request.getUserPrincipal().getName());
 
-            if(this.personSession.ownsComment(request.getUserPrincipal().getName(), CID)) this.productsService.deleteCommentFromProduct(CID, id);
-            this.personSession.deleteComment(CID);
-            this.productsService.deleteComment(CID);
+            if(this.personSession.ownsComment(request.getUserPrincipal().getName(), CID)){
+                this.productsService.deleteCommentFromProduct(CID, id);
+                this.personSession.deleteComment(CID, per);
+                this.productsService.deleteComment(CID);
+            } else if(this.personSession.isAdmin(per)){
+                this.productsService.deleteCommentFromProduct(CID, id);
+                this.personSession.deleteComment(CID);
+                this.productsService.deleteComment(CID);
+
+            }
             model.addAttribute("product", p);
-            model.addAttribute("commentList", p.getComments());
         }
 
-        return "showProduct";
+        return showProduct(model, request, id);
     }
 
     @GetMapping("/searchProduct")
@@ -291,4 +314,27 @@ public class ProductController {
         return "searchResults";
     }
 
+
+    @GetMapping("/login")
+    public String login(){
+        return "login";
+    }
+
+    @GetMapping("/register")
+    public String register(){
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String registerUser(Model m, @RequestParam String username, @RequestParam String password){
+        //If the username already exist we cant create a new one with the same name
+        if(this.personSession.exists(username)) {
+            m.addAttribute("usedUser", true);
+            return "register";
+        } else {
+            this.personSession.newPerson(username, password);
+            m.addAttribute("name", username);
+            return "registerConfirmed";
+        }
+    }
 }

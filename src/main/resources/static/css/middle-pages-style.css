@@ -13,6 +13,10 @@
     background: rgba(183, 253, 104, 0.38);
 }
 
+#newUser{
+    background: rgba(88 241 248 / 34%);
+}
+
 .image-alert{
     align-items: center;
     width: 27%;

@@ -55,19 +55,20 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers("/searchProduct").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/loginerror").permitAll()
+                        .requestMatchers("/register").permitAll()
                         .requestMatchers("/error").permitAll()
 
 
 
 
                         // PRIVATE PAGES
-                        .requestMatchers("/followProduct").hasAnyRole("USER")
-                        .requestMatchers("/product/{id}/newComment").hasAnyRole("USER")
-                        .requestMatchers("/removeProductFromCart").hasAnyRole("USER")
-                        .requestMatchers("/shoppingCart").hasAnyRole("USER")
+                        .requestMatchers("/followProduct").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/product/{id}/newComment").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/removeProductFromCart").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/shoppingCart").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/product/{id}/comment/{CID}").hasAnyRole("USER","ADMIN")
 
                         .requestMatchers("/newProduct").hasRole("ADMIN")
-                        .requestMatchers("/product/{id}/comment/{CID}").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/delete").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/edit").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/modify").hasRole("ADMIN")
@@ -75,8 +76,8 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
-                        .defaultSuccessUrl("/")
                         .failureUrl("/loginerror")
+                        .defaultSuccessUrl("/")
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -84,7 +85,6 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .logoutSuccessUrl("/")
                         .permitAll()
                 );
-
         // Disable CSRF at the moment
         http.csrf(csrf -> csrf.disable());
 
