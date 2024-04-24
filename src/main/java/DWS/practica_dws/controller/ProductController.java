@@ -235,7 +235,7 @@ public class ProductController {
     @PostMapping("/removeProductFromCart")
     public String removeProductFromCart(Model model, @RequestParam String id, HttpServletRequest request) {
         long identification = Long.parseLong(id);
-        this.personSession.unfollow(identification);
+        this.personSession.unfollow(identification, request.getUserPrincipal().getName());
         model.addAttribute("products", this.productsService.availableProducts(this.personSession.personProducts(request.getUserPrincipal())));
         return "shoppingCart";
     }

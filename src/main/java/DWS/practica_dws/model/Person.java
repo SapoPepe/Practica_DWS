@@ -59,6 +59,14 @@ public class Person {
         }
     }
 
+    //If the user has the same product followed more than one time, this method erase all
+    public void deleteProductFromCart(Product p){
+        for(int i = this.userProducts.size()-1; i >= 0; i--){
+            Product aux = this.userProducts.get(i);
+            if(p.equals(aux)) this.userProducts.remove(i);
+        }
+    }
+
     public Collection<Product> cartProducts(){
         return this.userProducts;
     }

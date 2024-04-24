@@ -131,13 +131,6 @@ public class ProductsService {
         return finalList;
     }
 
-    public void removeProductFromCart(long id, PersonSession userSession) {
-        Optional<Product> productToRemove = this.products.findById(id);
-        if (productToRemove.isPresent()) {
-            userSession.unfollow(id);
-        }
-    }
-
     public List<Product> getProductsByName(String productName) {
         return this.products.findProductByName(productName);
     }

@@ -49,9 +49,9 @@ public class PersonSession {
         }
     }
 
-    public void unfollow(Long id){
+    public void unfollow(Long id, String userName){
         Optional<Product> o = this.productsService.getProduct(id);
-        Person per = this.persons.findById(Long.valueOf(1)).orElseThrow();
+        Person per = this.persons.findByPersonName(userName).orElseThrow();
 
         if(o.isPresent()){
             Product p = o.get();
@@ -77,7 +77,7 @@ public class PersonSession {
     public void deleteProductFromCarts(Product p){
         List<Person> aux = this.persons.findAll();
         for(Person per : aux){
-            per.unfollowProduct(p);
+            per.deleteProductFromCart(p);
             this.persons.save(per);
         }
     }
