@@ -1,197 +1,136 @@
-.wrapper {
-    --input-focus: #2d8cf0;
-    --font-color: #323232;
-    --font-color-sub: #666;
-    --bg-color: #fff;
-    --bg-color-alt: #666;
-    --main-color: #323232;
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* align-items: center; */
+body {
+    background-image: url("../images/logo.png");
+    background-repeat: repeat;
+    background-size: 14.3vw 14.3vw;
 }
-/* switch card */
-.switch {
-    transform: translateY(-200px);
-    position: relative;
+
+
+
+.contenedor{
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-    gap: 30px;
-    width: 50px;
-    height: 20px;
-}
-
-.card-side::before {
-    position: absolute;
-    content: 'Log in';
-    left: -70px;
-    top: 0;
-    width: 100px;
-    text-decoration: underline;
-    color: var(--font-color);
-    font-weight: 600;
-}
-
-.card-side::after {
-    position: absolute;
-    content: 'Sign up';
-    left: 70px;
-    top: 0;
-    width: 100px;
-    text-decoration: none;
-    color: var(--font-color);
-    font-weight: 600;
-}
-
-.toggle {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    box-sizing: border-box;
-    border-radius: 5px;
-    border: 2px solid var(--main-color);
-    box-shadow: 4px 4px var(--main-color);
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--bg-colorcolor);
-    transition: 0.3s;
-}
-
-.slider:before {
-    box-sizing: border-box;
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    border: 2px solid var(--main-color);
-    border-radius: 5px;
-    left: -2px;
-    bottom: 2px;
-    background-color: var(--bg-color);
-    box-shadow: 0 3px 0 var(--main-color);
-    transition: 0.3s;
-}
-
-.toggle:checked + .slider {
-    background-color: var(--input-focus);
-}
-
-.toggle:checked + .slider:before {
-    transform: translateX(30px);
-}
-
-.toggle:checked ~ .card-side:before {
-    text-decoration: none;
-}
-
-.toggle:checked ~ .card-side:after {
-    text-decoration: underline;
-}
-
-/* card */
-
-.flip-card__inner {
-    width: 300px;
-    height: 350px;
-    position: relative;
-    background-color: transparent;
-    perspective: 1000px;
-    /* width: 100%;
-    height: 100%; */
-    text-align: center;
-    transition: transform 0.8s;
-    transform-style: preserve-3d;
-}
-
-.toggle:checked ~ .flip-card__inner {
-    transform: rotateY(180deg);
-}
-
-.toggle:checked ~ .flip-card__front {
-    box-shadow: none;
-}
-
-.flip-card__front, .flip-card__back {
-    padding: 20px;
-    position: absolute;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    background: lightgrey;
-    gap: 20px;
-    border-radius: 5px;
-    border: 2px solid var(--main-color);
-    box-shadow: 4px 4px var(--main-color);
+    height: 100vh;
 }
 
-.flip-card__back {
+.content {
+    width: 25vw;
+    padding: 3vw 3vw;
+    background: #dde1e7;
+    border-radius: 1vw;
+    box-shadow: -.3vw -.3vw .7vw #ffffff73,
+    .6vw .6vw .7vw rgba(94,104,121,0.288);
+    font-family: Arial;
+    margin: 0 auto;
+}
+
+.content .text {
+    font-size: 2.5vw;
+    font-weight: 600;
+    margin-bottom: 2vw;
+    color: #595959;
+}
+
+.content .error{
+    font-size: 1.2vw;
+    font-weight: 600;
+    color: #ff0000;
+    margin-bottom: 1vw;
+}
+
+.field {
+    height: 2.6vw;
     width: 100%;
-    transform: rotateY(180deg);
-}
-
-.flip-card__form {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    position: relative;
 }
 
-.title {
-    margin: 20px 0 20px 0;
-    font-size: 25px;
-    font-weight: 900;
-    text-align: center;
-    color: var(--main-color);
+.field:nth-child(2) {
+    margin-top: 20px;
 }
 
-.flip-card__input {
-    width: 250px;
-    height: 40px;
-    border-radius: 5px;
-    border: 2px solid var(--main-color);
-    background-color: var(--bg-color);
-    box-shadow: 4px 4px var(--main-color);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--font-color);
-    padding: 5px 10px;
+.field .input {
+    height: 100%;
+    width: 100%;
+    padding-left: 2.7vw;
     outline: none;
+    border: none;
+    font-size: 1.2vw;
+    background: #dde1e7;
+    color: #595959;
+    border-radius: 2.5vw;
+    box-shadow: inset .2vw .2vw .5vw #BABECC,
+    inset -.5vw -.5vw 1vw #ffffff73;
 }
 
-.flip-card__input::placeholder {
-    color: var(--font-color-sub);
-    opacity: 0.8;
+.field .input:focus {
+    box-shadow: inset 1px 1px 2px #BABECC,
+    inset -1px -1px 2px #ffffff73;
 }
 
-.flip-card__input:focus {
-    border: 2px solid var(--input-focus);
+.field .span {
+    position: absolute;
+    color: #595959;
+    width: 2.8vw;
+    line-height: 3.4vw;
 }
 
-.flip-card__btn:active, .button-confirm:active {
-    box-shadow: 0px 0px var(--main-color);
-    transform: translate(3px, 3px);
+.field .label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-35%);
+    left: 2.7vw;
+    pointer-events: none;
+    color: #666666;
 }
 
-.flip-card__btn {
-    margin: 20px 0 20px 0;
-    width: 120px;
-    height: 40px;
-    border-radius: 5px;
-    border: 2px solid var(--main-color);
-    background-color: var(--bg-color);
-    box-shadow: 4px 4px var(--main-color);
-    font-size: 17px;
+.field .input:valid ~ label {
+    opacity: 0;
+}
+
+.button {
+    margin: 1.5vw 0;
+    width: 100%;
+    font-size: 1.2vw;
+    line-height: 2.7vw;
     font-weight: 600;
-    color: var(--font-color);
+    background: rgba(148, 255, 129, 0.44);
+    border-radius: 2.5vw;
+    border: none;
+    outline: none;
     cursor: pointer;
+    color: #595959;
+    box-shadow: .2vw .2vw .5vw #BABECC,
+    -.5vw -.5vw 1vw #ffffff73;
+}
+
+.button:focus {
+    color: #0bb400;
+    box-shadow: inset .2vw .2vw .5vw #BABECC,
+    inset -.5vw -.5vw 1vw #ffffff73;
+}
+
+.sign-up {
+    margin: 1vw 0;
+    color: #595959;
+    font-size: 1vw;
+}
+
+.sign-up a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.sign-up a:hover {
+    text-decoration: underline;
+}
+
+#home{
+    background: #dde1e7; !important;
+}
+
+#home:focus {
+    color: #3498db; !important;
+    box-shadow: inset .2vw .2vw .5vw #BABECC,
+    inset -.5vw -.5vw 1vw #ffffff73; !important;
 }

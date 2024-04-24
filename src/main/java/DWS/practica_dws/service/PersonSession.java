@@ -133,4 +133,8 @@ public class PersonSession {
         for(String s : roles) if(s.equals("ADMIN")) return true;
         return false;
     }
+
+    public boolean correctNameAndPass(String name, String pass){
+        return name!=null && !name.isEmpty() && pass!=null && !pass.isEmpty();
+    }
 }

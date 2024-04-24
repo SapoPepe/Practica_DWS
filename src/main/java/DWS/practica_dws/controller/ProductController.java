@@ -320,6 +320,11 @@ public class ProductController {
         return "login";
     }
 
+    @GetMapping("/loginerror")
+    public String loginerror(){
+        return "loginerror";
+    }
+
     @GetMapping("/register")
     public String register(){
         return "register";
@@ -330,6 +335,9 @@ public class ProductController {
         //If the username already exist we cant create a new one with the same name
         if(this.personSession.exists(username)) {
             m.addAttribute("usedUser", true);
+            return "register";
+        } else if (!this.personSession.correctNameAndPass(username, password)) {
+            m.addAttribute("invalidUser", true);
             return "register";
         } else {
             this.personSession.newPerson(username, password);
