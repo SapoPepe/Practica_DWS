@@ -55,7 +55,8 @@
         {{/notLogged}}
 
         {{#logged}}
-        <form action="/logout" method="get" class="right-bar-button-content">
+        <form action="/logout" method="post" class="right-bar-button-content">
+            <input type="hidden" name="_csrf" value="{{token}}"/>
             <button class="right-bar-button" id="identification_logged" type="submit">
                 <span>Desconectar de {{userName}}</span>
                 <svg class="top-bar-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
