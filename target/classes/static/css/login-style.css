@@ -1,0 +1,136 @@
+body {
+    background-image: url("../images/logo.png");
+    background-repeat: repeat;
+    background-size: 14.3vw 14.3vw;
+}
+
+
+
+.contenedor{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.content {
+    width: 25vw;
+    padding: 3vw 3vw;
+    background: #dde1e7;
+    border-radius: 1vw;
+    box-shadow: -.3vw -.3vw .7vw #ffffff73,
+    .6vw .6vw .7vw rgba(94,104,121,0.288);
+    font-family: Arial;
+    margin: 0 auto;
+}
+
+.content .text {
+    font-size: 2.5vw;
+    font-weight: 600;
+    margin-bottom: 2vw;
+    color: #595959;
+}
+
+.content .error{
+    font-size: 1.2vw;
+    font-weight: 600;
+    color: #ff0000;
+    margin-bottom: 1vw;
+}
+
+.field {
+    height: 2.6vw;
+    width: 100%;
+    display: flex;
+    position: relative;
+}
+
+.field:nth-child(2) {
+    margin-top: 20px;
+}
+
+.field .input {
+    height: 100%;
+    width: 100%;
+    padding-left: 2.7vw;
+    outline: none;
+    border: none;
+    font-size: 1.2vw;
+    background: #dde1e7;
+    color: #595959;
+    border-radius: 2.5vw;
+    box-shadow: inset .2vw .2vw .5vw #BABECC,
+    inset -.5vw -.5vw 1vw #ffffff73;
+}
+
+.field .input:focus {
+    box-shadow: inset 1px 1px 2px #BABECC,
+    inset -1px -1px 2px #ffffff73;
+}
+
+.field .span {
+    position: absolute;
+    color: #595959;
+    width: 2.8vw;
+    line-height: 3.4vw;
+}
+
+.field .label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-35%);
+    left: 2.7vw;
+    pointer-events: none;
+    color: #666666;
+}
+
+.field .input:valid ~ label {
+    opacity: 0;
+}
+
+.button {
+    margin: 1.5vw 0;
+    width: 100%;
+    font-size: 1.2vw;
+    line-height: 2.7vw;
+    font-weight: 600;
+    background: rgba(148, 255, 129, 0.44);
+    border-radius: 2.5vw;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: #595959;
+    box-shadow: .2vw .2vw .5vw #BABECC,
+    -.5vw -.5vw 1vw #ffffff73;
+}
+
+.button:focus {
+    color: #0bb400;
+    box-shadow: inset .2vw .2vw .5vw #BABECC,
+    inset -.5vw -.5vw 1vw #ffffff73;
+}
+
+.sign-up {
+    margin: 1vw 0;
+    color: #595959;
+    font-size: 1vw;
+}
+
+.sign-up a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.sign-up a:hover {
+    text-decoration: underline;
+}
+
+#home{
+    background: #dde1e7; !important;
+}
+
+#home:focus {
+    color: #3498db; !important;
+    box-shadow: inset .2vw .2vw .5vw #BABECC,
+    inset -.5vw -.5vw 1vw #ffffff73; !important;
+}

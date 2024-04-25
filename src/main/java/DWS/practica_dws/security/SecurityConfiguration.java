@@ -73,6 +73,8 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers("/product/{id}/edit").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/modify").hasRole("ADMIN")
 
+                        .requestMatchers("/profile").hasAnyRole("USER","ADMIN")
+
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
@@ -85,8 +87,6 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .logoutSuccessUrl("/")
                         .permitAll()
                 );
-        // Disable CSRF at the moment
-        http.csrf(csrf -> csrf.disable());
 
         return http.build();
     }

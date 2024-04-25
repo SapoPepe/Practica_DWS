@@ -16,7 +16,7 @@ public class DatabaseInicializer {
 
     @PostConstruct
     public void init(){
-        personRepository.save(new Person("manolo", securityConfiguration.passwordEncoder().encode("pass"), "USER"));
+        personRepository.save(new Person("a", securityConfiguration.passwordEncoder().encode("a"), "USER"));
         personRepository.save(new Person("lucia", securityConfiguration.passwordEncoder().encode("adminpass"), "USER", "ADMIN"));
 
 

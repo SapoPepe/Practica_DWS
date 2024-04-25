@@ -1,37 +1,32 @@
 package DWS.practica_dws.controller;
 
-
 import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.Person;
 import DWS.practica_dws.model.Product;
+import DWS.practica_dws.repository.PersonRepository;
 import DWS.practica_dws.service.FileService;
 import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.PersonSession;
 import DWS.practica_dws.service.ProductsService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.security.Principal;
 import java.sql.SQLException;
-import java.util.*;
-
-import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Controller
 public class ProductController {
@@ -41,6 +36,8 @@ public class ProductController {
     private ProductsService productsService;
     @Autowired
     private FileService fileService;
+
+    private PersonRepository personRepository;
 
      private ImageService imageService = new ImageService();
 
@@ -316,9 +313,10 @@ public class ProductController {
 
 
     @GetMapping("/login")
-    public String login(){
+    public String login() {
         return "login";
     }
+
 
     @GetMapping("/loginerror")
     public String loginerror(){
@@ -344,5 +342,18 @@ public class ProductController {
             m.addAttribute("name", username);
             return "registerConfirmed";
         }
+    }
+
+    @GetMapping("/profile")
+    public String privatePage(Model model, HttpServletRequest request) {
+
+        String name = request.getUserPrincipal().getName();
+
+        Person user = personRepository.findByPersonName(name).orElseThrow();
+
+        model.addAttribute("username", user.getName());
+        model.addAttribute("admin", request.isUserInRole("ADMIN"));
+
+        return "profile";
     }
 }
