@@ -68,6 +68,7 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers("/shoppingCart").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/product/{id}/comment/{CID}").hasAnyRole("USER","ADMIN")
 
+                        .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/newProduct").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/delete").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/edit").hasRole("ADMIN")

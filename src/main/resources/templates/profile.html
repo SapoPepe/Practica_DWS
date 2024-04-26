@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <body>
-<h1>Hola  {{username}}!</h1>
 
+<h1>Hola {{username}}!</h1>
 
 {{#admin}}
 <a href="/admin">Admin Page</a>
@@ -11,10 +11,10 @@
 <br>
 <br>
 
-<form action="/logout" method="get">
-    <!-- Cuando hablilitemos csrf aqui arriba ira un post
-    <input type="hidden" name="_csrf" value="{{token}}"/> -->
-    <input type="submit" value="Sign Out" />
+<!--<form action="/logout" method="get">
+     Cuando hablilitemos csrf aqui arriba ira un post
+    <input type="hidden" name="_csrf" value="{{token}}"/>
+    <input type="submit" value="Sign Out" /> -->
 </form>
 </body>
 </html>

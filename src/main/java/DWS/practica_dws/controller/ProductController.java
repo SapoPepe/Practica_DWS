@@ -349,7 +349,7 @@ public class ProductController {
 
         String name = request.getUserPrincipal().getName();
 
-        Person user = personRepository.findByPersonName(name).orElseThrow();
+        Person user = this.personSession.getUser(name);
 
         model.addAttribute("username", user.getName());
         model.addAttribute("admin", request.isUserInRole("ADMIN"));
@@ -357,4 +357,8 @@ public class ProductController {
         return "profile";
     }
 
+    @GetMapping("/admin")
+    public String adminPage() {
+        return "admin";
+    }
 }
