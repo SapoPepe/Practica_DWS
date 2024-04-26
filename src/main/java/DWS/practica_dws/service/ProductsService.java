@@ -156,8 +156,8 @@ public class ProductsService {
     }
 
 
-    public boolean correctComment(String name, Integer score) {
-        return name != null && !name.isEmpty() && score != null && !score.describeConstable().isEmpty() && score.intValue() >= 0 && score.intValue() <= 10;
+    public boolean correctComment(Integer score) {
+        return score != null && !score.describeConstable().isEmpty() && score.intValue() >= 0 && score.intValue() <= 10;
     }
 
     public boolean correctFilter(Double min, Double max) {
@@ -224,5 +224,13 @@ public class ProductsService {
         value = Jsoup.clean( value,  safeList );
 
         return value;
+    }
+
+    public void deleteCommentsFromProductsPerson(String personName){
+        List<Product> products = this.products.findAll();
+        for(Product p : products){
+            p.deleteCommentsFromPerson(personName);
+            this.saveProduct(p);
+        }
     }
 }

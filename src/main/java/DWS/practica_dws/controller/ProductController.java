@@ -247,12 +247,12 @@ public class ProductController {
 
 
     @PostMapping("/product/{id}/newComment")
-    public String newComment(Model model, HttpServletRequest request, @PathVariable long id, @RequestParam(required = false) String userName,
-                             @RequestParam(required = false) Integer score, @RequestParam(required = false) String opinion){
+    public String newComment(Model model, HttpServletRequest request, @PathVariable long id, @RequestParam(required = false) Integer score,
+                             @RequestParam(required = false) String opinion){
         Optional<Product> aux = productsService.getProduct(id);
         if(aux.isPresent()){
             Product p = aux.get();
-            if(this.productsService.correctComment(userName, score)) {
+            if(this.productsService.correctComment(score)) {
                 Comment comment = new Comment(request.getUserPrincipal(), score.intValue(), opinion);
                 p.addComment(comment);
                 this.productsService.saveProduct(p);
@@ -344,21 +344,32 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/profile")
-    public String privatePage(Model model, HttpServletRequest request) {
+    @GetMapping("/adminPannel")
+    public String admin(Model m, HttpServletRequest request) throws Exception {
+        Person per = this.personSession.getUser(request.getUserPrincipal().getName());
 
-        String name = request.getUserPrincipal().getName();
+        if(this.personSession.isAdmin(per)){
+            List<Person> users = this.personSession.getUsers();
+            users.remove(per);
+            m.addAttribute("persons", users);
+        } else throw new Exception();
 
-        Person user = this.personSession.getUser(name);
-
-        model.addAttribute("username", user.getName());
-        model.addAttribute("admin", request.isUserInRole("ADMIN"));
-
-        return "profile";
+        return "adminPannel";
     }
 
-    @GetMapping("/admin")
-    public String adminPage() {
-        return "admin";
+    @PostMapping("/deletePerson/{id}")
+    public String deletePerson(Model m, HttpServletRequest request, @PathVariable long id) throws Exception {
+        Person admin = this.personSession.getUser(request.getUserPrincipal().getName());
+
+        //If this request is form the admin and is not trying to delete itself, we delete de user
+        if(this.personSession.isAdmin(admin) && !admin.samePerson(id)){
+            this.personSession.deletePerson(id);
+            List<Person> users = this.personSession.getUsers();
+            users.remove(admin);
+            m.addAttribute("persons", users);
+        } else throw new Exception();
+
+        return admin(m, request);
     }
+
 }

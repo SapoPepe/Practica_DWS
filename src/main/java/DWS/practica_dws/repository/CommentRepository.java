@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<Comment> findByCIDAndUserName(long CID, String userName);
+    Optional<Comment> findByUserName(String userName);
+
 }

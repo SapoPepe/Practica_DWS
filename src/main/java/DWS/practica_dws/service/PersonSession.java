@@ -63,6 +63,13 @@ public class PersonSession {
         }
     }
 
+    public void unfollow(Product p, Person per){
+        p.removePerson(per);
+        this.productsService.saveProduct(p);
+        per.unfollowProduct(p);
+        this.persons.save(per);
+    }
+
     public Collection<Product> personProducts(Principal principal){
         Person per = this.persons.findByPersonName(principal.getName()).orElseThrow();
         return per.cartProducts();
@@ -72,7 +79,9 @@ public class PersonSession {
         return this.persons.findByPersonName(userName).orElseThrow();
     }
 
-
+    public List<Person> getUsers(){
+        return this.persons.findAll();
+    }
 
     public void deleteProductFromCarts(Product p){
         List<Person> aux = this.persons.findAll();
@@ -128,6 +137,20 @@ public class PersonSession {
         this.persons.save(new Person(username, this.securityConfiguration.passwordEncoder().encode(password), "USER"));
     }
 
+    public void deletePerson(long id){
+        Person p = this.persons.findById(id).orElseThrow();
+        //Delete the comments of the user in the hall application
+        this.productsService.deleteCommentsFromProductsPerson(p.getName());
+        //Unfollowing all the products that he followed
+        Object[] products = p.cartProducts().toArray();
+        for(int i = products.length - 1; i>=0; i--){
+            Product pro = (Product) products[i];
+            unfollow(pro, p);
+        }
+
+        this.persons.deleteById(id);
+    }
+
     public boolean isAdmin(Person p){
         List<String> roles = p.getRoles();
         for(String s : roles) if(s.equals("ADMIN")) return true;
@@ -137,4 +160,5 @@ public class PersonSession {
     public boolean correctNameAndPass(String name, String pass){
         return name!=null && !name.isEmpty() && pass!=null && !pass.isEmpty();
     }
+
 }

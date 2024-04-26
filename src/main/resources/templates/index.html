@@ -5,7 +5,7 @@
     <title>Home</title>
     <link rel="stylesheet" href="/css/index-style.css" type="text/css">
     <link rel="stylesheet" href="/css/topBar-style.css" type="text/css">
-
+    <script src="/js/user-menu.js"></script>
 </head>
 <body>
 
@@ -39,16 +39,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
                     <path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path>            </svg>
             </button>
-            <input type="hidden" name="_csrf" value="{{token}}"/>
-        </form>
-        {{/admin}}
-        {{#admin}}
-        <form action="/admin" method="get" class="right-bar-button-content">
-            <button class="right-bar-button" id="new-product" type="submit">
-                <span>Admin zone</span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                    <path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path>            </svg>
-            </button>
         </form>
         {{/admin}}
 
@@ -65,29 +55,37 @@
         {{/notLogged}}
 
         {{#logged}}
-        <form action="/logout" method="post" class="right-bar-button-content">
-            <input type="hidden" name="_csrf" value="{{token}}"/>
-            <button class="right-bar-button" id="identification_logged" type="submit">
-                <span>Desconectar de {{userName}}</span>
+        {{#admin}}
+        <div class="right-bar-button-content identification-container">
+            <button class="right-bar-button identification_logged">
+                <span>Opciones de {{userName}}</span>
                 <svg class="top-bar-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                     <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
                     <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
                 </svg>
             </button>
-        </form>
-        {{/logged}}
+        </div>
 
-        {{#logged}}
-        <form action="/profile" method="get" class="right-bar-button-content">
 
-            <button class="right-bar-button orange-button" id="identification_logged" type="submit">
-                <span>Ver mi perfil: {{userName}}</span>
-                <svg class="top-bar-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                    <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                    <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
-                </svg>
-            </button>
-        </form>
+        <div id="menuContainer" class="menu-container">
+            <a href="/adminPannel" id="adminPanelLink">Panel de administrador</a>
+            <a href="/logout" id="logoutLink">Desconectar</a>
+        </div>
+        {{/admin}}
+        {{^admin}}
+        <div class="right-bar-button-content identification-container">
+            <form action="/logout" method="post">
+                <button class="right-bar-button identification_logged" type="submit">
+                    <span>Desconectar de {{userName}}</span>
+                    <svg class="top-bar-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                        <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+                    </svg>
+                </button>
+                <input type="hidden" name="_csrf" value="{{token}}"/>
+            </form>
+        </div>
+        {{/admin}}
         {{/logged}}
 
         <form action="/shoppingCart" method="get" class="right-bar-button-content">

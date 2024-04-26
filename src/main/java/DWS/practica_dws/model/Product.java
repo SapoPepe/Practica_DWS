@@ -95,6 +95,14 @@ public class Product {
         this.comments.clear();
     }
 
+    //It deletes all the comments from a person
+    public void deleteCommentsFromPerson(String personName){
+        for(int i = this.comments.size()-1; i >= 0; i--){
+            Comment c = this.comments.get(i);
+            if(c.hasPerson(personName)) this.comments.remove(c);
+        }
+    }
+
     @JsonIgnore
     public Blob getImageFile(){
         return this.image;
@@ -139,8 +147,13 @@ public class Product {
      }
 
     public void removePerson(Person u){
-        this.inUsersShoppingCart.remove(u);
-        this.numProductsInCarts--;
+        for(int i=this.inUsersShoppingCart.size() - 1; i>=0; i--){
+            Person p = this.inUsersShoppingCart.get(i);
+            if(p.samePerson(u.getID())){
+                this.inUsersShoppingCart.remove(i);
+                this.numProductsInCarts--;
+            }
+        }
     }
 
     public void addUsers(Person u){

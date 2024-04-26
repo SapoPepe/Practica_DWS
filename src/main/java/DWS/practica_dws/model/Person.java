@@ -28,6 +28,9 @@ public class Person {
     @ManyToMany
     private List<Product> userProducts = new ArrayList<>();
 
+    private long numberProducts;
+    private long numberComments;
+
     public Person() {
     }
 
@@ -35,6 +38,8 @@ public class Person {
         this.personName = name;
         this.encodedPassword = encodedPassword;
         this.roles = List.of(roles);
+        this.numberComments = 0;
+        this.numberProducts = 0;
     }
 
 
@@ -47,6 +52,7 @@ public class Person {
 
     public void followProduct(Product p){
         this.userProducts.add(p);
+        this.numberProducts = this.userProducts.size();
     }
 
     public void unfollowProduct(Product p){
@@ -57,6 +63,7 @@ public class Person {
                 break;
             }
         }
+        this.numberProducts = this.userProducts.size();
     }
 
     //If the user has the same product followed more than one time, this method erase all
@@ -65,6 +72,7 @@ public class Person {
             Product aux = this.userProducts.get(i);
             if(p.equals(aux)) this.userProducts.remove(i);
         }
+        this.numberProducts = this.userProducts.size();
     }
 
     public Collection<Product> cartProducts(){
@@ -77,10 +85,12 @@ public class Person {
 
     public void addComment(Comment comment){
         comments.add(comment);
+        this.numberComments = this.comments.size();
     }
 
     public void deleteComment(Comment c){
         this.comments.remove(c);
+        this.numberComments = this.comments.size();
     }
 
     public boolean hasComment(Comment c){
@@ -104,5 +114,9 @@ public class Person {
 
     public void setRoles(List<String> roles) {
         this.roles = roles;
+    }
+
+    public boolean samePerson(long id){
+        return this.id == id;
     }
 }

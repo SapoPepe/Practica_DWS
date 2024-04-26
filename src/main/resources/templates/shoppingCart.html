@@ -4,57 +4,78 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/topBar-style.css" type="text/css">
     <link rel="stylesheet" href="/css/shoppingCart-style.css" type="text/css">
+    <script src="/js/user-menu.js"></script>
+
     <title>Carrito</title>
 </head>
 <body>
-    <div class="top-bar">
-        <div class="logo-container">
-            <a href="/"><img src="/images/logo.png"></a>
-        </div>
+<div class="top-bar">
+    <div class="logo-container">
+        <a href="/"><img src="/images/logo.png"></a>
+    </div>
 
-        <div class="searchBar">
-            <form action="/searchProduct" method="get">
-                <label for="search">
-                    <input id="search" type="text" name="productName" required="" autocomplete="off" placeholder="Buscar producto">
-                    <div class="searchIcon">
-                        <svg stroke-width="2" stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="swap-on">
-                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linejoin="round" stroke-linecap="round"></path>
-                        </svg>
-                    </div>
-                    <button type="reset" class="close-btn">
-                        <svg viewBox="0 0 20 20" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
-                            <path clip-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" fill-rule="evenodd"></path>
-                        </svg>
-                    </button>
-                </label>
-            </form>
-        </div>
-        <div class="top-bar-buttons-container">
-            {{#admin}}
-            <form action="/newProduct" method="get" class="right-bar-button-content">
-                <button class="right-bar-button" id="new-product" type="submit">
-                    <span>Crear producto</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                        <path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path>            </svg>
-                </button>
-            </form>
-            {{/admin}}
-
-            {{#notLogged}}
-            <form action="/login" method="get" class="right-bar-button-content">
-                <button class="right-bar-button" id="identification" type="submit">
-                    <span>Login</span>
-                    <svg class="top-bar-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+    <div class="searchBar">
+        <form action="/searchProduct" method="get">
+            <label for="search">
+                <input id="search" type="text" name="productName" required="" autocomplete="off" placeholder="Buscar producto">
+                <div class="searchIcon">
+                    <svg stroke-width="2" stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="swap-on">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linejoin="round" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+                <button type="reset" class="close-btn">
+                    <svg viewBox="0 0 20 20" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+                        <path clip-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" fill-rule="evenodd"></path>
                     </svg>
                 </button>
-            </form>
-            {{/notLogged}}
+            </label>
+        </form>
+    </div>
+    <div class="top-bar-buttons-container">
+        {{#admin}}
+        <form action="/newProduct" method="get" class="right-bar-button-content">
+            <button class="right-bar-button" id="new-product" type="submit">
+                <span>Crear producto</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path>            </svg>
+            </button>
+        </form>
+        {{/admin}}
 
-            {{#logged}}
-            <form action="/logout" method="post" class="right-bar-button-content">
-                <button class="right-bar-button" id="identification_logged" type="submit">
+        {{#notLogged}}
+        <form action="/login" method="get" class="right-bar-button-content">
+            <button class="right-bar-button" id="identification" type="submit">
+                <span>Login</span>
+                <svg class="top-bar-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                </svg>
+            </button>
+        </form>
+        {{/notLogged}}
+
+        {{#logged}}
+        {{#admin}}
+        <div class="right-bar-button-content identification-container">
+            <button class="right-bar-button identification_logged">
+                <span>Opciones de {{userName}}</span>
+                <svg class="top-bar-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                    <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                    <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+                </svg>
+            </button>
+        </div>
+
+
+        <div id="menuContainer" class="menu-container">
+            <a href="/adminPannel" id="adminPanelLink">Panel de administrador</a>
+            <a href="/logout" id="logoutLink">Desconectar</a>
+        </div>
+        {{/admin}}
+        {{^admin}}
+        <div class="right-bar-button-content identification-container">
+            <form action="/logout" method="post">
+                <button class="right-bar-button identification_logged" type="submit">
                     <span>Desconectar de {{userName}}</span>
                     <svg class="top-bar-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                         <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
@@ -63,13 +84,14 @@
                 </button>
                 <input type="hidden" name="_csrf" value="{{token}}"/>
             </form>
-            {{/logged}}
-
         </div>
+        {{/admin}}
+        {{/logged}}
     </div>
-    <hr>
+</div>
+<hr>
 
-    <div class="all-products">
+<div class="all-products">
         {{#products}}
         <div class="product-container">
             <form method="post" action="/removeProductFromCart?id={{id}}">

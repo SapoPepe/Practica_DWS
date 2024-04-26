@@ -1,0 +1,34 @@
+.persons-container{
+    justify-content: center;
+    margin: 0 auto;
+    width: 50%;
+    font-family: Arial;
+}
+
+.person{
+    display: flex;
+    border: .1vw grey solid;
+    border-radius: 1vw;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 2vw;
+    padding-left: 2vw;
+    margin-bottom: 2vw;
+}
+
+.person form{
+    display: flex;
+    width: 20%;
+    justify-content: right
+}
+
+.noUsers{
+    margin: 0 auto;
+}
+
+.noUsers p{
+    font-family: Arial;
+    font-size: 3vw;
+    text-align: center;
+}

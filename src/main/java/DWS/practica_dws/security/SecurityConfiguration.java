@@ -71,8 +71,10 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/newProduct").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/delete").hasRole("ADMIN")
+                        .requestMatchers("/deletePerson/{id}").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/edit").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/modify").hasRole("ADMIN")
+                        .requestMatchers("/adminPannel").hasRole("ADMIN")
 
                         .requestMatchers("/profile").hasAnyRole("USER","ADMIN")
 
