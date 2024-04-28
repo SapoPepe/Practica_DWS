@@ -1,4 +1,4 @@
-/*package DWS.practica_dws.controller;
+package DWS.practica_dws.controller;
 
 import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.CustomError;
@@ -8,16 +8,23 @@ import DWS.practica_dws.service.FileService;
 import DWS.practica_dws.service.ImageService;
 import DWS.practica_dws.service.PersonSession;
 import DWS.practica_dws.service.ProductsService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.security.core.GrantedAuthority;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -32,6 +39,29 @@ public class ProductRestController {
     private FileService fileService;
 
     private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
+
+    @Autowired
+    JwtEncoder encoder;
+
+    @PostMapping("/token")
+    public String token(Authentication authentication) {
+        Instant now = Instant.now();
+        long expiry = 36000L;
+        // @formatter:off
+        String scope = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(" "));
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("self")
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(expiry))
+                .subject(authentication.getName())
+                .claim("scope", scope)
+                .build();
+        // @formatter:on
+        return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
 
     @GetMapping("/products")
     public ResponseEntity<Collection<Product>> showAllProducts(@RequestParam(required = false) String name, @RequestParam(required = false) Double min,
@@ -114,8 +144,8 @@ public class ProductRestController {
 
     //followProduct
     @GetMapping("/user/shoppingCart")
-    public ResponseEntity showShoppingCart(){
-        Collection<Product> list = productsService.availableProducts(userSession.personProducts());
+    public ResponseEntity showShoppingCart(HttpServletRequest request){
+        Collection<Product> list = productsService.availableProducts(userSession.personProducts(request.getUserPrincipal()));
         if(!list.isEmpty()){
             return new ResponseEntity<>(list, HttpStatus.OK);
         } else {
@@ -125,10 +155,10 @@ public class ProductRestController {
 
 
     @PostMapping("/user/shoppingCart")
-    public ResponseEntity addShoppingCart(@RequestParam long productId){
+    public ResponseEntity addShoppingCart(@RequestParam long productId, HttpServletRequest request){
         //Long identification = Long.parseLong(id);
         if(productsService.getProduct(productId).isPresent()){
-            this.userSession.follow(productId);
+            this.userSession.follow(productId, request.getUserPrincipal());
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -136,9 +166,10 @@ public class ProductRestController {
     }
 
     @DeleteMapping("/user/shoppingCart")
-    public ResponseEntity deleteShoppingCart(@RequestParam long productId){
+    public ResponseEntity deleteShoppingCart(@RequestParam long productId, HttpServletRequest request){
         if(productsService.getProduct(productId).isPresent()){
-            productsService.removeProductFromCart(productId, userSession);
+            //productsService.removeProductFromCart(productId, userSession);
+            this.userSession.unfollow(productId, request.getUserPrincipal().getName());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -147,13 +178,14 @@ public class ProductRestController {
 
 
     @PostMapping("/products/{productId}/comments")
-    public ResponseEntity addComment(@PathVariable long productId, @RequestBody Comment comment){
+    public ResponseEntity addComment(@PathVariable long productId, @RequestBody Comment comment, HttpServletRequest request){
         Optional<Product> product = this.productsService.getProduct(productId);
         //If the product exist and the comment is well-formed, it's add to the product
-        if(product.isPresent() && this.productsService.correctComment(comment.getUserName(), comment.getScore())){
+        if(product.isPresent() && this.productsService.correctComment(comment.getScore())){
             product.get().addComment(comment);
             productsService.saveProduct(product.get());
-            userSession.getUser().addComment(comment);
+            this.userSession.addComment(comment, request.getUserPrincipal().getName());
+            //userSession.getUser(request.getUserPrincipal().getName()).addComment(comment);
             return new ResponseEntity<>(comment, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new CustomError("Algo ha salido mal. Revisa los datos."), HttpStatus.BAD_REQUEST);
@@ -293,6 +325,3 @@ public class ProductRestController {
     }
 
 }
-
-
- */
