@@ -2,7 +2,7 @@ package DWS.practica_dws.controller;
 
 import DWS.practica_dws.model.Comment;
 import DWS.practica_dws.model.CustomError;
-//import DWS.practica_dws.model.Image;
+import DWS.practica_dws.model.Person;
 import DWS.practica_dws.model.Product;
 import DWS.practica_dws.service.FileService;
 import DWS.practica_dws.service.ImageService;
@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -195,13 +197,20 @@ public class ProductRestController {
 
 
     @DeleteMapping("/products/{id}/comments/{CID}")
-    public ResponseEntity deleteComment(@PathVariable long id, @PathVariable long CID){
+    public ResponseEntity deleteComment(HttpServletRequest request, @PathVariable long id, @PathVariable long CID){
         if(!productsService.getProduct(id).isPresent()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        productsService.deleteCommentFromProduct(CID, id);
-        this.userSession.deleteComment(CID);
-        this.productsService.deleteComment(CID);
+        Person per = this.userSession.getUser(request.getUserPrincipal().getName());
+        if(this.userSession.ownsComment(request.getUserPrincipal().getName(), CID)){
+            this.productsService.deleteCommentFromProduct(CID, id);
+            this.userSession.deleteComment(CID, per);
+            this.productsService.deleteComment(CID);
+        } else if(this.userSession.isAdmin(per)){
+            this.productsService.deleteCommentFromProduct(CID, id);
+            this.userSession.deleteComment(CID);
+            this.productsService.deleteComment(CID);
+        }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -322,6 +331,68 @@ public class ProductRestController {
         }catch (Exception exception){
             return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+
+    @GetMapping("/persons")
+    public ResponseEntity adminShowAllUsers(HttpServletRequest request) throws Exception {
+        Person per = this.userSession.getUser(request.getUserPrincipal().getName());
+        List<Person> users = this.userSession.getUsers();
+        users.remove(per);
+
+        return new ResponseEntity<>(users, HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/persons/register")
+    public ResponseEntity registerUser(@RequestParam String username, @RequestParam String password){
+        //If the username already exist we cant create a new one with the same name
+        if(this.userSession.exists(username)) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        } else if (!this.userSession.correctNameAndPass(username, password)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            this.userSession.newPerson(username, password);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
+
+
+    @GetMapping("/persons/{id}")
+    public ResponseEntity showPerson(HttpServletRequest request) throws Exception {
+        Person per = this.userSession.getUser(request.getUserPrincipal().getName());
+        return new ResponseEntity<>(per, HttpStatus.OK);
+    }
+
+/*
+    @PutMapping("/persons/{id}")
+    public ResponseEntity editUser(@RequestParam String username, @RequestParam String password){
+        //If the username already exist we cant create a new one with the same name
+        if(this.userSession.exists(username)) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        } else {
+            this.userSession.editPerson(username, password);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
+*/
+
+    @DeleteMapping("/persons/{id}")
+    public ResponseEntity deletePerson(HttpServletRequest request, @PathVariable long id) throws Exception {
+        Person admin = this.userSession.getUser(request.getUserPrincipal().getName());
+
+        //If this request is form the admin and is not trying to delete itself, we delete de user
+        if(this.userSession.isAdmin(admin) && !admin.samePerson(id)){
+            this.userSession.deletePerson(id);
+            //List<Person> users = this.userSession.getUsers();
+            //users.remove(admin);
+        } else if(!this.userSession.isAdmin(admin) && this.userSession.getPerson().samePerson(id)){
+            this.userSession.deletePerson(id);
+            //List<Person> users = this.userSession.getUsers();
+            //users.remove(admin);
+        } else throw new Exception();
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

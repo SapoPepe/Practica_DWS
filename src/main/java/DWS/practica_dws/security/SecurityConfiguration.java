@@ -12,10 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -57,7 +60,7 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
     }
     static class CustomAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
         public AbstractAuthenticationToken convert(Jwt jwt) {
-            Collection<String> authorities = jwt.getClaimAsStringList("roles");
+            Collection<String> authorities = jwt.getClaimAsStringList("scope");
             Collection<GrantedAuthority> grantedAuthorities = authorities.stream()
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
@@ -82,6 +85,61 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
 
 
 
+     @Bean
+    public SecurityFilterChain securityJwtTokeFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/token")
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/api/token").authenticated()
+                )
+                .csrf((csrf) -> csrf.ignoringRequestMatchers("/api/token"))
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
+
+    @Bean
+    public SecurityFilterChain securityJwtFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/**")
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(HttpMethod.GET, "/api/user/shoppingCart").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/user/shoppingCart").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/user/shoppingCart").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/products/*/comments").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/*/comments/*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/persons/*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/persons/*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/persons/*").hasAnyRole("USER","ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/products/*/image").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/*/image").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/*/image").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/products/*/file").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/*/file").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/*/file").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/persons").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/*/image").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/*/file").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/persons/register").permitAll()
+                )
+                .csrf((csrf) -> csrf.ignoringRequestMatchers("/api/products"))
+                .oauth2ResourceServer(oAuth -> oAuth.jwt(Customizer.withDefaults()))
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt
+                        .jwtAuthenticationConverter(new CustomAuthenticationConverter())
+                )
+        );
+        return http.build();
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -99,9 +157,6 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers("/loginerror").permitAll()
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/error").permitAll()
-
-
-
 
                         // PRIVATE PAGES
                         .requestMatchers("/followProduct").hasAnyRole("USER", "ADMIN")

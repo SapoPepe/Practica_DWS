@@ -161,4 +161,7 @@ public class PersonSession {
         return name!=null && !name.isEmpty() && pass!=null && !pass.isEmpty();
     }
 
+    public Person getPerson() {
+        return person;
+    }
 }
