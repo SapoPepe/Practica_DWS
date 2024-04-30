@@ -10,7 +10,6 @@ import DWS.practica_dws.service.PersonSession;
 import DWS.practica_dws.service.ProductsService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -131,7 +130,7 @@ public class ProductController {
 
     @GetMapping("/product/{id}/file")
     public ResponseEntity<Object> downloadFile(@PathVariable long id) throws MalformedURLException{
-        return fileService.createResponseFromImage(id);
+        return fileService.createResponseFromFile(id);
     }
 
 

@@ -288,7 +288,7 @@ public class ProductRestController {
     @GetMapping("/products/{id}/file")
     public ResponseEntity getFile(@PathVariable long id){
         try {
-            return fileService.createResponseFromImage(id);
+            return fileService.createResponseFromFile(id);
         }catch (Exception exception){
             return new ResponseEntity<>(new CustomError("Algo ha salido mal."), HttpStatus.INTERNAL_SERVER_ERROR);
         }

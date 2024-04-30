@@ -30,15 +30,16 @@ public class FileService {
     }
 
     public void saveFile(Product p, MultipartFile file) throws IOException {
+        //If the file has an ../../ for saving in other path that is not the supposed, we threw an exception
+        if(file.getOriginalFilename().contains("/") || file.getOriginalFilename().contains("\\")) throw new IOException();
         Path folder = FILES_FOLDER.resolve(PRODUCTS_FOLDER);
         Files.createDirectories(folder.resolve(String.valueOf(p.getId())));
         Path newFile = createFilePath(file.getOriginalFilename(),folder,p.getId());
         file.transferTo(newFile);
-
         p.setFile(true, file.getOriginalFilename());
     }
 
-    public ResponseEntity<Object> createResponseFromImage(long productID) throws MalformedURLException {
+    public ResponseEntity<Object> createResponseFromFile(long productID) throws MalformedURLException {
         Path folder = FILES_FOLDER.resolve(PRODUCTS_FOLDER);
         Product p = this.productsService.getProduct(productID).orElseThrow();
 
