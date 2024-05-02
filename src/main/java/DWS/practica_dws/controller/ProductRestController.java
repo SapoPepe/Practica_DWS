@@ -183,6 +183,7 @@ public class ProductRestController {
     public ResponseEntity addComment(@PathVariable long productId, @RequestBody Comment comment, HttpServletRequest request){
         Optional<Product> product = this.productsService.getProduct(productId);
         //If the product exist and the comment is well-formed, it's add to the product
+        comment.setUserName(request.getUserPrincipal().getName());
         if(product.isPresent() && this.productsService.correctComment(comment.getScore())){
             product.get().addComment(comment);
             productsService.saveProduct(product.get());
@@ -337,20 +338,19 @@ public class ProductRestController {
 
     @GetMapping("/persons")
     public ResponseEntity adminShowAllUsers(HttpServletRequest request) throws Exception {
-        Person per = this.userSession.getUser(request.getUserPrincipal().getName());
+        //Person per = this.userSession.getUser(request.getUserPrincipal().getName());
         List<Person> users = this.userSession.getUsers();
-        users.remove(per);
-
-        return new ResponseEntity<>(users, HttpStatus.NO_CONTENT);
+        //users.remove(per);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PostMapping("/persons/register")
+    @PostMapping("/person")
     public ResponseEntity registerUser(@RequestParam String username, @RequestParam String password){
         //If the username already exist we cant create a new one with the same name
         if(this.userSession.exists(username)) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         } else if (!this.userSession.correctNameAndPass(username, password)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         } else {
             this.userSession.newPerson(username, password);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -358,41 +358,37 @@ public class ProductRestController {
     }
 
 
-    @GetMapping("/persons/{id}")
+    @GetMapping("/person")
     public ResponseEntity showPerson(HttpServletRequest request) throws Exception {
         Person per = this.userSession.getUser(request.getUserPrincipal().getName());
         return new ResponseEntity<>(per, HttpStatus.OK);
     }
 
-/*
-    @PutMapping("/persons/{id}")
-    public ResponseEntity editUser(@RequestParam String username, @RequestParam String password){
+
+    @PutMapping("/person")
+    public ResponseEntity editUser(HttpServletRequest request, @RequestParam String username, @RequestParam String password){
         //If the username already exist we cant create a new one with the same name
         if(this.userSession.exists(username)) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        } else {
-            this.userSession.editPerson(username, password);
+        } else if (!this.userSession.correctNameAndPass(username, password)) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }else {
+            Person admin = this.userSession.getUser(request.getUserPrincipal().getName());
+            this.userSession.editPerson(admin.getID(), username, password);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
-*/
 
-    @DeleteMapping("/persons/{id}")
+
+    @DeleteMapping("/person")
     public ResponseEntity deletePerson(HttpServletRequest request, @PathVariable long id) throws Exception {
         Person admin = this.userSession.getUser(request.getUserPrincipal().getName());
 
-        //If this request is form the admin and is not trying to delete itself, we delete de user
         if(this.userSession.isAdmin(admin) && !admin.samePerson(id)){
             this.userSession.deletePerson(id);
-            //List<Person> users = this.userSession.getUsers();
-            //users.remove(admin);
-        } else if(!this.userSession.isAdmin(admin) && this.userSession.getPerson().samePerson(id)){
+        } else if(!this.userSession.isAdmin(admin) && admin.samePerson(id)){
             this.userSession.deletePerson(id);
-            //List<Person> users = this.userSession.getUsers();
-            //users.remove(admin);
-        } else throw new Exception();
-
+        } else new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 }

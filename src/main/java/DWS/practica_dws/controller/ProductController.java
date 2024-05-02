@@ -239,7 +239,9 @@ public class ProductController {
 
     @GetMapping("/shoppingCart")
     public String userProducts(Model m, HttpServletRequest request){
+        m.addAttribute("personId", this.personSession.getUser(request.getUserPrincipal().getName()).getID());
         m.addAttribute("products", this.productsService.availableProducts(this.personSession.personProducts(request.getUserPrincipal())));
+
         return "shoppingCart";
     }
 
@@ -366,9 +368,34 @@ public class ProductController {
             List<Person> users = this.personSession.getUsers();
             users.remove(admin);
             m.addAttribute("persons", users);
-        } else throw new Exception();
+            return admin(m, request);
+        } else if(!this.personSession.isAdmin(admin) && admin.samePerson(id)){
+            this.personSession.deletePerson(id);
+            return "/logout";
+        }
+        else throw new Exception();
+    }
 
-        return admin(m, request);
+    @GetMapping("/modifyUser")
+    public String modify(){
+        return "modifyUser";
+    }
+
+    @PostMapping("/modifyUser")
+    public String modifyUser(HttpServletRequest request, Model m, @RequestParam String username, @RequestParam String password){//, @PathVariable long id
+        //If the username already exist we cant create a new one with the same name
+        if(this.personSession.exists(username)) {
+            m.addAttribute("usedUser", true);
+            return "modifyUser";
+        } else if (!this.personSession.correctNameAndPass(username, password)) {
+            m.addAttribute("invalidUser", true);
+            return "modifyUser";
+        } else {
+            Person admin = this.personSession.getUser(request.getUserPrincipal().getName());
+            this.personSession.editPerson(admin.getID(), username, password);
+            return "/logout";
+        }
+
     }
 
 }

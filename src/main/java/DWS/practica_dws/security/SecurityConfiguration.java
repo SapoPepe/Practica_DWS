@@ -108,9 +108,9 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers(HttpMethod.DELETE, "/api/user/shoppingCart").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/products/*/comments").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/*/comments/*").hasAnyRole("USER","ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/persons/*").hasAnyRole("USER","ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/persons/*").hasAnyRole("USER","ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/persons/*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/person").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/person").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/person").hasAnyRole("USER","ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/*").hasRole("ADMIN")
@@ -127,9 +127,12 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers(HttpMethod.GET, "/api/products/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/*/image").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/*/file").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/persons/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/person").permitAll()
                 )
-                .csrf((csrf) -> csrf.ignoringRequestMatchers("/api/products"))
+                .csrf((csrf) -> csrf.ignoringRequestMatchers("/api/products")
+                        .ignoringRequestMatchers("/api/person")
+                        .ignoringRequestMatchers("/api/persons")
+                        .ignoringRequestMatchers("/api/user"))
                 .oauth2ResourceServer(oAuth -> oAuth.jwt(Customizer.withDefaults()))
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.oauth2ResourceServer(oauth2 -> oauth2
@@ -159,6 +162,9 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers("/error").permitAll()
 
                         // PRIVATE PAGES
+                        //.requestMatchers("/logout").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/deletePerson/{id}").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/modifyUser").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/followProduct").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/product/{id}/newComment").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/removeProductFromCart").hasAnyRole("USER", "ADMIN")
@@ -168,7 +174,7 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/newProduct").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/delete").hasRole("ADMIN")
-                        .requestMatchers("/deletePerson/{id}").hasRole("ADMIN")
+                        //.requestMatchers("/deletePerson/{id}").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/edit").hasRole("ADMIN")
                         .requestMatchers("/product/{id}/modify").hasRole("ADMIN")
                         .requestMatchers("/adminPannel").hasRole("ADMIN")

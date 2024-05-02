@@ -161,7 +161,10 @@ public class PersonSession {
         return name!=null && !name.isEmpty() && pass!=null && !pass.isEmpty();
     }
 
-    public Person getPerson() {
-        return person;
+    public void editPerson(long id, String username, String password) {
+        Person p = this.persons.findById(id).orElseThrow();
+        p.setName(username);
+        p.setEncodedPassword(this.securityConfiguration.passwordEncoder().encode(password));
+        this.persons.save(p);
     }
 }
