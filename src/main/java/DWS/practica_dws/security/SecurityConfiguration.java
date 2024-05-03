@@ -1,5 +1,6 @@
 package DWS.practica_dws.security;
 
+import DWS.practica_dws.security.jwt.JwtRequestFilter;
 import DWS.practica_dws.service.RepositoryUserDetailsService;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -14,9 +15,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.SecurityBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,6 +35,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -44,29 +48,9 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
     @Autowired
     public RepositoryUserDetailsService userDetailService;
 
-    @Value("${jwt.public.key}")
-    RSAPublicKey key;
-    @Value("${jwt.private.key}")
-    RSAPrivateKey priv;
-    @Bean
-    JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(this.key).build();
-    }
-    @Bean
-    JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(this.key).privateKey(this.priv).build();
-        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-        return new NimbusJwtEncoder(jwks);
-    }
-    static class CustomAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
-        public AbstractAuthenticationToken convert(Jwt jwt) {
-            Collection<String> authorities = jwt.getClaimAsStringList("scope");
-            Collection<GrantedAuthority> grantedAuthorities = authorities.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-            return new JwtAuthenticationToken(jwt, grantedAuthorities);
-        }
-    }
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -83,23 +67,16 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
         return authProvider;
     }
 
-
-
-     @Bean
-    public SecurityFilterChain securityJwtTokeFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/api/token")
-                .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/token").authenticated()
-                )
-                .csrf((csrf) -> csrf.ignoringRequestMatchers("/api/token"))
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        return http.build();
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain securityJwtFilterChain(HttpSecurity http) throws Exception {
+
+        http.authenticationProvider(authenticationProvider());
+
         http
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests((authorize) -> authorize
@@ -110,7 +87,7 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers(HttpMethod.DELETE, "/api/products/*/comments/*").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/person").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/person").hasAnyRole("USER","ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/person").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/person/*").hasAnyRole("USER","ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/*").hasRole("ADMIN")
@@ -128,18 +105,27 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
                         .requestMatchers(HttpMethod.GET, "/api/products/*/image").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/*/file").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/person").permitAll()
-                )
-                .csrf((csrf) -> csrf.ignoringRequestMatchers("/api/products")
-                        .ignoringRequestMatchers("/api/person")
-                        .ignoringRequestMatchers("/api/persons")
-                        .ignoringRequestMatchers("/api/user"))
-                .oauth2ResourceServer(oAuth -> oAuth.jwt(Customizer.withDefaults()))
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                        .jwtAuthenticationConverter(new CustomAuthenticationConverter())
-                )
-        );
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
+
+                );
+
+        // Disable Form login Authentication
+        http.formLogin(formLogin -> formLogin.disable());
+
+        // Disable CSRF protection (it is difficult to implement in REST APIs)
+        http.csrf(csrf -> csrf.disable());
+
+        // Disable Basic Authentication
+        http.httpBasic(httpBasic -> httpBasic.disable());
+
+        // Stateless session
+        http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        // Add JWT Token filter
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

@@ -42,27 +42,6 @@ public class ProductRestController {
 
     private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
-    @Autowired
-    JwtEncoder encoder;
-
-    @PostMapping("/token")
-    public String token(Authentication authentication) {
-        Instant now = Instant.now();
-        long expiry = 36000L;
-        // @formatter:off
-        String scope = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("self")
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiry))
-                .subject(authentication.getName())
-                .claim("scope", scope)
-                .build();
-        // @formatter:on
-        return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-    }
 
 
     @GetMapping("/products")
@@ -380,7 +359,7 @@ public class ProductRestController {
     }
 
 
-    @DeleteMapping("/person")
+    @DeleteMapping("/person/{id}")
     public ResponseEntity deletePerson(HttpServletRequest request, @PathVariable long id) throws Exception {
         Person admin = this.userSession.getUser(request.getUserPrincipal().getName());
 
@@ -388,7 +367,7 @@ public class ProductRestController {
             this.userSession.deletePerson(id);
         } else if(!this.userSession.isAdmin(admin) && admin.samePerson(id)){
             this.userSession.deletePerson(id);
-        } else new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        } else return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
