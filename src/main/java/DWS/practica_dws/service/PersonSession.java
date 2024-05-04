@@ -161,10 +161,27 @@ public class PersonSession {
         return name!=null && !name.isEmpty() && pass!=null && !pass.isEmpty();
     }
 
+    public boolean correctName(String name){
+        return name!=null && !name.isEmpty();
+    }
+
+    public boolean correctPass(String pass){
+        return pass!=null && !pass.isEmpty();
+    }
+    public boolean correctPassForPerson(String username, String pass){
+        Person p = this.persons.findByPersonName(username).orElseThrow();
+        String encodePass = p.getEncodedPassword();
+        return this.securityConfiguration.passwordEncoder().matches(pass, encodePass);
+    }
+
     public void editPerson(long id, String username, String password) {
         Person p = this.persons.findById(id).orElseThrow();
         p.setName(username);
         p.setEncodedPassword(this.securityConfiguration.passwordEncoder().encode(password));
         this.persons.save(p);
+    }
+
+    public boolean hasValue(String value){
+        return value!=null && !value.isEmpty();
     }
 }

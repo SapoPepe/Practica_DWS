@@ -345,7 +345,7 @@ public class ProductRestController {
 
 
     @PutMapping("/person")
-    public ResponseEntity editUser(HttpServletRequest request, @RequestParam String username, @RequestParam String password){
+    public ResponseEntity editUser(HttpServletRequest request, @RequestParam(required = false) String username, @RequestParam(required = false) String password){
         //If the username already exist we cant create a new one with the same name
         if(this.userSession.exists(username)) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);

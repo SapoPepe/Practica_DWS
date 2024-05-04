@@ -43,10 +43,7 @@ body {
     width: 100%;
     display: flex;
     position: relative;
-}
-
-.field:nth-child(2) {
-    margin-top: 20px;
+    margin-bottom: 1vw;
 }
 
 .field .input {
@@ -84,9 +81,7 @@ body {
     color: #666666;
 }
 
-.field .input:valid ~ label {
-    opacity: 0;
-}
+
 
 .button {
     margin: 1.5vw 0;
@@ -104,10 +99,19 @@ body {
     -.5vw -.5vw 1vw #ffffff73;
 }
 
+.delete_user{
+    margin-top: 0; !important;
+    background: rgba(255, 129, 129, 0.44); !important;
+}
+
 .button:focus {
     color: #0bb400;
     box-shadow: inset .2vw .2vw .5vw #BABECC,
     inset -.5vw -.5vw 1vw #ffffff73;
+}
+
+.delete_user:focus{
+    color: #b40000;
 }
 
 .sign-up {
@@ -134,3 +138,4 @@ body {
     box-shadow: inset .2vw .2vw .5vw #BABECC,
     inset -.5vw -.5vw 1vw #ffffff73; !important;
 }
+

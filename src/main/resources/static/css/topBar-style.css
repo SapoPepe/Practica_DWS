@@ -192,7 +192,11 @@
     background-color: #cacacae0;
     font-family: Arial;
     font-size: 1.2vw;
+}
 
+.menu-container-shoppingcart{
+    animation: fadeInDownCart 0.5s ease forwards;
+    top: 5vw; !important;
 }
 
 .menu-container a {
@@ -200,6 +204,7 @@
     text-decoration: none;
     color: #333;
     margin-bottom: 5px;
+    width: fit-content;
 }
 
 .menu-container a:hover {
@@ -219,6 +224,35 @@
         transform: translateY(4vw);
         z-index: 1000;
     }
+}
+
+@keyframes fadeInDownCart {
+    from {
+        opacity: 0;
+        transform: translateX(12vw);
+        z-index: -1;
+    }
+    to {
+        opacity: 1;
+        transform: translateX(6vw);
+        z-index: 1000;
+    }
+}
+
+
+.logout-button{
+    border: none;
+    background: none;
+    font-size: 1.2vw;
+    color: #333;
+    padding: 0;
+}
+
+.logout-button:hover{
+    color: #0c9905;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 

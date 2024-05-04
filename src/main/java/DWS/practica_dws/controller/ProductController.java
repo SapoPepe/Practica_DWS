@@ -377,25 +377,42 @@ public class ProductController {
     }
 
     @GetMapping("/modifyUser")
-    public String modify(){
+    public String modify(Model m, HttpServletRequest request){
+        Person p = this.personSession.getUser(request.getUserPrincipal().getName());
+        m.addAttribute("personId", p.getID());
         return "modifyUser";
     }
 
     @PostMapping("/modifyUser")
-    public String modifyUser(HttpServletRequest request, Model m, @RequestParam String username, @RequestParam String password){//, @PathVariable long id
+    public String modifyUser(HttpServletRequest request, Model m, @RequestParam(required = false) String username, @RequestParam(required = false) String password,
+                             @RequestParam(required = true) String existing_password){//, @PathVariable long id
+
+        Person p = this.personSession.getUser(request.getUserPrincipal().getName());
+
         //If the username already exist we cant create a new one with the same name
         if(this.personSession.exists(username)) {
+            m.addAttribute("personId", p.getID());
             m.addAttribute("usedUser", true);
             return "modifyUser";
-        } else if (!this.personSession.correctNameAndPass(username, password)) {
-            m.addAttribute("invalidUser", true);
-            return "modifyUser";
-        } else {
-            Person admin = this.personSession.getUser(request.getUserPrincipal().getName());
-            this.personSession.editPerson(admin.getID(), username, password);
-            return "/logout";
         }
+        //If the username or password is correct and the original password corresponds with the original user password
+        else if ((this.personSession.correctName(username) || this.personSession.correctPass(password)) &&
+                this.personSession.correctPassForPerson(request.getUserPrincipal().getName(), existing_password)) {
 
+            Person admin = this.personSession.getUser(request.getUserPrincipal().getName());
+            String name, pass;
+            if(this.personSession.hasValue(username)) name = username;
+            else name = admin.getName();
+            if(this.personSession.hasValue(password)) pass = password;
+            else pass = existing_password;
+            this.personSession.editPerson(admin.getID(), name, pass);
+            return "/logout";
+
+        } else {
+            m.addAttribute("invalidUser", true);
+            m.addAttribute("personId", p.getID());
+            return "modifyUser";
+        }
     }
 
 }
