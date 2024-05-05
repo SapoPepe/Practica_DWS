@@ -345,16 +345,23 @@ public class ProductRestController {
 
 
     @PutMapping("/person")
-    public ResponseEntity editUser(HttpServletRequest request, @RequestParam(required = false) String username, @RequestParam(required = false) String password){
-        //If the username already exist we cant create a new one with the same name
+    public ResponseEntity editUser(HttpServletRequest request, @RequestParam(required = false) String username, @RequestParam(required = false) String password, @RequestParam String existing_password){
         if(this.userSession.exists(username)) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         } else if (!this.userSession.correctNameAndPass(username, password)) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        }else {
+        }else if((this.userSession.correctName(username) || this.userSession.correctPass(password)) &&
+                this.userSession.correctPassForPerson(request.getUserPrincipal().getName(), existing_password)) {
             Person admin = this.userSession.getUser(request.getUserPrincipal().getName());
-            this.userSession.editPerson(admin.getID(), username, password);
+            String name, pass;
+            if(this.userSession.hasValue(username)) name = username;
+            else name = admin.getName();
+            if(this.userSession.hasValue(password)) pass = password;
+            else pass = existing_password;
+            this.userSession.editPerson(admin.getID(), name, pass);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
