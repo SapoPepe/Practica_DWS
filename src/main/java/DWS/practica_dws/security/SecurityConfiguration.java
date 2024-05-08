@@ -1,6 +1,7 @@
 package DWS.practica_dws.security;
 
 import DWS.practica_dws.security.jwt.JwtRequestFilter;
+import DWS.practica_dws.security.jwt.UnauthorizedHandlerJwt;
 import DWS.practica_dws.service.RepositoryUserDetailsService;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -51,6 +53,9 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
+    @Autowired
+    private UnauthorizedHandlerJwt unauthorizedHandlerJwt;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -73,12 +78,16 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
     }
 
     @Bean
+    @Order(1)
     public SecurityFilterChain securityJwtFilterChain(HttpSecurity http) throws Exception {
 
         http.authenticationProvider(authenticationProvider());
 
         http
                 .securityMatcher("/api/**")
+                .exceptionHandling(handling -> handling.authenticationEntryPoint(unauthorizedHandlerJwt));
+
+        http
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.GET, "/api/user/shoppingCart").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/user/shoppingCart").hasAnyRole("USER","ADMIN")
@@ -130,6 +139,7 @@ public class SecurityConfiguration implements WebSecurityCustomizer {
     }
 
     @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.authenticationProvider(authenticationProvider());

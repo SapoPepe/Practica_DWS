@@ -3,6 +3,7 @@ package DWS.practica_dws.model;
 import java.util.HashSet;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -18,8 +19,10 @@ public class Person {
 
     private String personName;
 
+    @JsonIgnore
     private String encodedPassword;
 
+    @JsonIgnore
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
