@@ -122,4 +122,12 @@ public class Person {
     public boolean samePerson(long id){
         return this.id == id;
     }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public List<Product> getUserProducts() {
+        return userProducts;
+    }
 }
