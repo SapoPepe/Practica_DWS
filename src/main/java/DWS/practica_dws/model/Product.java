@@ -25,6 +25,7 @@ public class Product {
     //If the Product is being deleted, all their comments are deleted too
     @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> comments;
+    @JsonIgnore
     @ManyToMany
     private List<Person> inUsersShoppingCart;
 
